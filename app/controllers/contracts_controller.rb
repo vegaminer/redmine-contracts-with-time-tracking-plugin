@@ -205,7 +205,7 @@ class ContractsController < ApplicationController
   private
 
   def rates_are_valid(rates)
-    return false if rates.nil?
+    return true if rates.nil?
     rates.each_pair do |user_id, rate|
       if !is_number?(rate) or rate.to_f < 0
         return false
