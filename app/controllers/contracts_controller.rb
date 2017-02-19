@@ -83,7 +83,8 @@ class ContractsController < ApplicationController
 
     if !rates_are_valid(params[:rates])
       flash[:error] = l(:text_invalid_rate)
-      redirect_to :action => "new", :id => @contract.id
+      load_contractors_and_rates
+      render :new
       return
     end
 
@@ -224,6 +225,11 @@ class ContractsController < ApplicationController
         rate = @contract.user_contract_rate_or_default(contractor)
       end
       @contractor_rates[contractor.id] = rate
+    end
+    unless params[:rates].nil?
+      params[:rates].each do |contractor, rate|
+        @contractor_rates[contractor.to_i] = rate.to_f
+      end
     end
   end
 
