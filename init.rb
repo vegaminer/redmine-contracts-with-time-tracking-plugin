@@ -19,6 +19,10 @@ Redmine::Plugin.register :contracts do
   menu :application_menu, :contracts, { :controller => :contracts, :action => :all }, :caption => :label_contracts, :if => Proc.new { User.current.logged? && User.current.allowed_to?(:view_all_contracts_for_project, nil, :global => true) } 
   menu :project_menu, :contracts, { :controller => :contracts, :action => :index }, :caption => :label_contracts, :param => :project_id
 
+  if Redmine::VERSION.to_s >= '3.3'
+    menu :project_menu, :contracts, { :controller => :contracts, :action => 'new' }, :param => :project_id, :caption => :label_new_contract, :parent => :new_object
+  end
+
   settings :default => {'empty' => true}, :partial => 'settings/contract_settings'
 
   project_module :contracts do
