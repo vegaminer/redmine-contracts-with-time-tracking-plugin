@@ -1,11 +1,13 @@
 <div class="contextual">
-  <% if @project != nil && @contracts.size > 0 %>
+  <% if @project != nil %>
     <%= link_to_if_authorized l(:label_new_contract), { :controller => 'contracts', :action => 'new', :project_id => @project.identifier }, :class => 'icon icon-add' %>
   <% end %>
 </div>
 
 <h2><%= l(:label_contracts) %></h2>
-<% if @contracts.size > 0 %>
+<% if @contracts.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
   <%= render 'contracts_summary' %>
 
   <% if @show_tabs %>
@@ -33,10 +35,6 @@
     <%= render 'fixed_price_list' %>
   <% else %>
     <%= render 'contracts_list' %>
-  <% end %>
-<% else %>
-  <% if @project != nil %>
-    <%= link_to_if_authorized l(:label_new_contract), { :controller => 'contracts', :action => 'new', :project_id => @project.identifier }, :class => 'icon icon-add' %>
   <% end %>
 <% end %>
 
