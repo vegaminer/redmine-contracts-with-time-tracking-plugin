@@ -96,18 +96,18 @@
           <table class="hours-summary list">
             <thead>
             <tr>
-              <th><%= l(:label_members) %></th>
-              <th><%= l(:label_hours) %></th>
+              <th class="member"><%= l(:label_members) %></th>
+              <th class="hours"><%= l(:label_hours) %></th>
               <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
-                  <th><%= l(:label_contractor_rate) %></th>
-                  <th><%= l(:label_billable_amount) %></th>
+                  <th class="amount"><%= l(:label_contractor_rate) %></th>
+                  <th class="amount"><%= l(:label_billable_amount) %></th>
               <% end %>
             </tr>
             </thead>
             <tbody>
             <% @members.each do |member| %>
                 <tr class="<%= cycle("odd", "even") %>">
-                  <td><%= member.name %></td>
+                  <td class="member"><%= member.name %></td>
                   <td class="hours"><%= format_hours(@contract.hours_spent_by_user(member)) %></td>
                   <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
                       <td class="amount"><%= number_to_currency(@contract.user_contract_rate_or_default(member)) %></td>

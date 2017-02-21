@@ -61,6 +61,27 @@
   color:#0072ca;
 }
 
+table.hours-summary th.member {
+  text-align: left;
+  padding-left: 4px;
+}
+table.hours-summary th.hours, table.hours-summary th.amount {
+  text-align: right;
+  padding-right: 4px;
+}
+table.hours-summary td.hours, table.hours-summary td.amount {
+  font-weight: normal;
+  text-align: right;
+  padding-right: 4px;
+}
+table.hours-summary tr.total-hours, table.hours-summary tr.total-hours td.hours, table.hours-summary tr.total-hours td.amount  {
+  font-weight: bold;
+}
+table.hours-summary td.member {
+  text-align: left;
+  padding-left: 4px;
+}
+
 fieldset#contractor_rates { 
   width: 500px;
 }
