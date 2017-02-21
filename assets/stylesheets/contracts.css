@@ -1,3 +1,38 @@
+.parent
+{
+  width:100%;
+  white-space: nowrap;
+}
+
+.child
+{
+  display:inline-block;
+  /* Remove 4 px each to have room for 8px padding between the two columns */
+  width: calc(50% - 4px);
+  vertical-align: top;
+  padding-right: 8px;
+}
+.child:last-child
+{
+  padding-right: 0px;
+}
+
+@media screen and (max-width: 900px) {
+  .child
+  {
+    width:100%;
+    padding-right: 0px;
+  }
+  .parent
+  {
+    white-space: normal;
+  }
+}
+
+.contract-summary, .contract-summary-description {
+  white-space: normal;
+}
+
 .contracts-summary td{
   background: #EEE;
   padding: 10px;
@@ -24,15 +59,6 @@
 
 .blue{
   color:#0072ca;
-}
-
-.contract-summary-td {
-	width: 60%;
-	padding-right: 10px;
-}
-
-.hours-summary-td {
-	width: 35%;
 }
 
 fieldset#contractor_rates { 

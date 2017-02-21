@@ -23,105 +23,113 @@
   <% end %>
 </h2>
 
-<div>
-  <table>
-    <tr>
-      <td colspan="2"><p><%= @contract.description %></p></td>
-    </tr>
-    <tr>
-      <td class="contract-summary-td">
-        <table class="contract-summary list">
-          <thead>
-            <tr>
-              <th><%= l(:field_agreement_date) %></th>
-              <th><%= l(:label_date_period) %></th>
-              <% if (User.current.allowed_to?(:view_hourly_rate, @project) && !@contract.is_fixed_price) %>
-                <th><%= l(:field_hourly_rate) %></th>
-              <% elsif (User.current.allowed_to?(:view_hourly_rate, @project) && @contract.is_fixed_price) %>
-                <th><%= l(:label_effective_rate) %></th>
+<div class="parent">
+  <div class="child">
+    <table class="contract-summary list">
+      <thead>
+      <tr>
+        <th><%= l(:field_agreement_date) %></th>
+        <th><%= l(:label_date_period) %></th>
+        <% if (User.current.allowed_to?(:view_hourly_rate, @project) && !@contract.is_fixed_price) %>
+            <th><%= l(:field_hourly_rate) %></th>
+        <% elsif (User.current.allowed_to?(:view_hourly_rate, @project) && @contract.is_fixed_price) %>
+            <th><%= l(:label_effective_rate) %></th>
+        <% end %>
+        <th><%= l(:label_amount_purchased) %></th>
+        <% if !@contract.contract_url.blank? %>
+            <th><%= l(:label_contract) %></th>
+        <% end %>
+        <% if !@contract.invoice_url.blank? %>
+            <th><%= l(:label_invoice) %></th>
+        <% end %>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="<%= cycle("odd", "even") %>">
+        <td>
+          <% if @contract.agreement_date != nil %>
+              <%= format_date(@contract.agreement_date) %>
+          <% else %>
+              <%= l(:text_agreement_pending) %>
+          <% end %>
+        </td>
+        <td>
+          <% if @contract.start_date != nil %>
+              <%= format_date(@contract.start_date) %> -
+              <% if @contract.end_date != nil %>
+                  <%= format_date(@contract.end_date) %>
+              <% else %>
+                  <%= l(:text_no_end_date) %>
               <% end %>
-              <th><%= l(:label_amount_purchased) %></th>
-              <% if !@contract.contract_url.blank? %>
-                <th><%= l(:label_contract) %></th>
-              <% end %>
-              <% if !@contract.invoice_url.blank? %>
-                <th><%= l(:label_invoice) %></th>
-              <% end %>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="<%= cycle("odd", "even") %>">
-              <td>
-                <% if @contract.agreement_date != nil %>
-                  <%= format_date(@contract.agreement_date) %>
-                <% else %>
-                  <%= l(:text_agreement_pending) %>
-                <% end %>
-              </td>
-              <td>
-                <% if @contract.start_date != nil %>
-                  <%= format_date(@contract.start_date) %> -
-                  <% if @contract.end_date != nil %>
-                    <%= format_date(@contract.end_date) %>
-                  <% else %>
-                    <%= l(:text_no_end_date) %>
-                  <% end %>
-                <% end %>
-              </td>
-              <% if (User.current.allowed_to?(:view_hourly_rate, @project) && !@contract.is_fixed_price) %>
-                <td><%= number_to_currency(@contract.hourly_rate) %></td>
-              <% elsif (User.current.allowed_to?(:view_hourly_rate, @project) && @contract.is_fixed_price) %>
-                <td><%= number_to_currency(@contract.effective_rate) %><%=  l(:text_hour) %></td>
-              <% end %>
-              <td><%= number_to_currency(@contract.purchase_amount) %></td>
-              <% if !@contract.contract_url.blank? %>
-                  <td><%= link_to l(:label_view_contract), @contract.contract_url %></td>
-              <% end %>
-              <% if !@contract.invoice_url.blank? %>
-                  <td><%= link_to l(:label_view_invoice), @contract.invoice_url %></td>
-              <% end %>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-      <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
+          <% end %>
+        </td>
+        <% if (User.current.allowed_to?(:view_hourly_rate, @project) && !@contract.is_fixed_price) %>
+            <td><%= number_to_currency(@contract.hourly_rate) %></td>
+        <% elsif (User.current.allowed_to?(:view_hourly_rate, @project) && @contract.is_fixed_price) %>
+            <td><%= number_to_currency(@contract.effective_rate) %><%=  l(:text_hour) %></td>
+        <% end %>
+        <td><%= number_to_currency(@contract.purchase_amount) %></td>
+        <% if !@contract.contract_url.blank? %>
+            <td><%= link_to l(:label_view_contract), @contract.contract_url %></td>
+        <% end %>
+      </tr>
+      <% reset_cycle %>
+      </tbody>
+    </table>
+    <br>
+    <table class="contract-summary-description list">
+      <thead>
+      <tr>
+        <th><%= l(:label_description) %></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td><%= @contract.description.gsub(/[\n]/,"<br/>").html_safe %></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="child">
+    <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
         <td class="hours-summary-td">
           <table class="hours-summary list">
             <thead>
-              <tr>
-                <th><%= l(:label_members) %></th>
-                <th><%= l(:label_hours) %></th>
-                <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
+            <tr>
+              <th><%= l(:label_members) %></th>
+              <th><%= l(:label_hours) %></th>
+              <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
                   <th><%= l(:label_contractor_rate) %></th>
                   <th><%= l(:label_billable_amount) %></th>
-                <% end %>
-              </tr>
+              <% end %>
+            </tr>
             </thead>
             <tbody>
-              <% @members.each do |member| %>
+            <% @members.each do |member| %>
                 <tr class="<%= cycle("odd", "even") %>">
                   <td><%= member.name %></td>
-                  <td><%= format_hours(@contract.hours_spent_by_user(member)) %></td>
+                  <td class="hours"><%= format_hours(@contract.hours_spent_by_user(member)) %></td>
                   <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
-                    <td><%= number_to_currency(@contract.user_contract_rate_or_default(member)) %></td>
-                    <td><%= number_to_currency(@contract.billable_amount_for_user(member)) %></td>
+                      <td class="amount"><%= number_to_currency(@contract.user_contract_rate_or_default(member)) %></td>
+                      <td class="amount"><%= number_to_currency(@contract.billable_amount_for_user(member)) %></td>
                   <% end %>
                 </tr>
-              <% end %>
-              <tr class="total-hours">
-                <td></td>
-                <td><%= format_hours(@time_entries.map(&:hours).inject(0, &:+)) %></td>
-                <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
+            <% end %>
+            <% totalBillable = @contract.smart_billable_amount_total %>
+            <tr class="total-hours <%= cycle("odd", "even") %>">
+              <td></td>
+              <td class="hours"><%= format_hours(@time_entries.map(&:hours).inject(0, &:+)) %></td>
+              <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
                   <td></td>
-                  <td><%= number_to_currency(@contract.smart_billable_amount_total) %></td>
-                <% end %>
-              </tr>
+                  <td class="amount"><%= number_to_currency(totalBillable) %></td>
+              <% end %>
+            </tr>
             </tbody>
           </table>
         </td>
-      <% end %>
-    </tr>
-  </table>
+    <% end %>
+    <% reset_cycle %>
+  </div>
 </div>
 <div class="tabs">
   <ul>
