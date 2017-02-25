@@ -23,7 +23,7 @@ end
   <div class="box tabular">
     <p><%= f.text_field :name, :required => true %></p>
     <p>
-      <%= f.text_field :expense_date, :size => 12, :required => true %>
+      <%= f.date_field :expense_date, :size => 12, :required => true %>
       <%= calendar_for('contracts_expense_expense_date') %>
     </p>
     <p><%= f.text_field :amount, :size => 6, :required => true %></p>
