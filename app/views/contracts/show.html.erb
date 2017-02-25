@@ -166,6 +166,8 @@
         <li>
           <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id, :contracts_expenses => 'true' }) %>" <%= tab_selected if @expenses_tab %>><%= l(:label_expenses) %></a>
         </li>
+      <% end %>
+      <% if User.current.allowed_to?(:view_invoices, @project) %>
         <li>
           <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id, :contracts_invoices => 'true' }) %>" <%= tab_selected if @invoices_tab %>><%= l(:label_invoices) %></a>
         </li>
@@ -178,7 +180,7 @@
 </div>
 <% if @expenses_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) && User.current.allowed_to?(:view_expenses, @project) %>
   <%= render 'expenses_list' %>
-<% elsif @invoices_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) && User.current.allowed_to?(:view_expenses, @project) %>
+<% elsif @invoices_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) && User.current.allowed_to?(:view_invoices, @project) %>
   <%= render 'invoices_list' %>
 <% elsif @summary_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) %>
   <%= render 'contract_summary' %>
