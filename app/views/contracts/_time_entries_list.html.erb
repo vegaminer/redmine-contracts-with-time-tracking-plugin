@@ -1,3 +1,4 @@
+<%= hidden_field_tag 'back_url', url_for(params) %>
 <div class="autoscroll">
 <table class="time-entries-for-contract-list list">
   <thead>
@@ -14,7 +15,7 @@
       <th></th>
     </tr>
   </thead>
-  <% @time_entries.each do |time_entry| %>
+  <% @time_entries_page.each do |time_entry| %>
     <tr class="<%= cycle("odd", "even") %>">
       <td><%= format_date(time_entry.spent_on) %></td>
       <td><%= link_to time_entry.user.name, user_path(time_entry.user) %></td>
@@ -40,3 +41,6 @@
 </table>
 </div>
 
+<% unless @time_entries_page.empty? %>
+    <p class="pagination"><%= pagination_links_full @entry_pages, @entry_count %></p>
+<% end %>

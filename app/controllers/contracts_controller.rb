@@ -117,6 +117,9 @@ class ContractsController < ApplicationController
       @issues.sort! { |a,b| @contract.amount_spent_on_issue(b) <=> @contract.amount_spent_on_issue(a)}
     end
 
+    @entry_count = @time_entries.count
+    @entry_pages = Paginator.new @entry_count, per_page_option, params['page']
+    @time_entries_page = @time_entries[@entry_pages.offset, @entry_pages.per_page]
   end
 
   def edit
