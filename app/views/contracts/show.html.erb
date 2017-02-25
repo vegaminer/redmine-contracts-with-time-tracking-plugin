@@ -25,6 +25,7 @@
 
 <div class="parent">
   <div class="child">
+    <div class="autoscroll">
     <table class="contract-summary list">
       <thead>
       <tr>
@@ -76,7 +77,9 @@
       <% reset_cycle %>
       </tbody>
     </table>
+    </div>
     <br>
+    <div class="autoscroll">
     <table class="contract-summary-description list">
       <thead>
       <tr>
@@ -89,10 +92,11 @@
       </tr>
       </tbody>
     </table>
+    </div>
   </div>
   <div class="child">
     <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
-        <td class="hours-summary-td">
+        <div class="autoscroll">
           <table class="hours-summary list">
             <thead>
             <tr>
@@ -126,7 +130,7 @@
             </tr>
             </tbody>
           </table>
-        </td>
+        </div>
     <% end %>
     <% reset_cycle %>
   </div>
