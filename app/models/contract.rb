@@ -3,6 +3,7 @@ class Contract < ActiveRecord::Base
   has_many   :time_entries
   has_many   :user_contract_rates
   has_many   :contracts_expenses
+  has_many   :contracts_invoices
   belongs_to :category, :class_name => 'ContractCategory'
 
   validates_presence_of :start_date, :purchase_amount, :hourly_rate, :project_id
@@ -82,6 +83,10 @@ class Contract < ActiveRecord::Base
       return self.billable_amount_total
     end
     calculate_billable_amount_total
+  end
+
+  def invoices_amount
+    return self.contracts_invoices.sum(:amount)
   end
 
   def calculate_billable_amount_total

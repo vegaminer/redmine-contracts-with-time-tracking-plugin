@@ -5,6 +5,9 @@
   <% if !@contract.is_locked && User.current.allowed_to?(:create_expenses, @project) %>
     <%= link_to l(:label_add_expense), { :controller => 'contracts_expenses', :action => 'new', :project_id => @project.identifier }, :class => 'icon icon-add' %> &nbsp;&nbsp;&nbsp;
   <% end %>
+  <% if !@contract.is_locked && User.current.allowed_to?(:create_invoices, @project) %>
+    <%= link_to l(:label_add_invoice), { :controller => 'contracts_invoices', :action => 'new', :project_id => @project.identifier }, :class => 'icon icon-add' %> &nbsp;&nbsp;&nbsp;
+  <% end %>
 </div>
 
 <h2>
@@ -73,6 +76,9 @@
         <% if !@contract.contract_url.blank? %>
             <td><%= link_to l(:label_view_contract), @contract.contract_url %></td>
         <% end %>
+        <% if !@contract.invoice_url.blank? %>
+            <td><%= link_to l(:label_view_invoice), @contract.invoice_url %></td>
+        <% end %>
       </tr>
       <% reset_cycle %>
       </tbody>
@@ -128,6 +134,21 @@
                   <td class="amount"><%= number_to_currency(totalBillable) %></td>
               <% end %>
             </tr>
+            <% totalInvoiced = @contract.invoices_amount %>
+            <% if User.current.allowed_to?(:view_invoices, @project) && User.current.allowed_to?(:view_hourly_rate, @project) %>
+                <tr class="total-hours <%= cycle("odd", "even") %>">
+                  <td></td>
+                  <td></td>
+                  <td class="amount"><%= l(:field_invoiced) %></td>
+                  <td class="amount"><%= number_to_currency(totalInvoiced) %></td>
+                </tr>
+                <tr class="total-hours <%= cycle("odd", "even") %>">
+                  <td></td>
+                  <td></td>
+                  <td class="amount"><%= l(:field_unbilled) %></td>
+                  <td class="amount"><%= number_to_currency(totalBillable - totalInvoiced) %></td>
+                </tr>
+            <% end %>
             </tbody>
           </table>
         </div>
@@ -138,12 +159,15 @@
 <div class="tabs">
   <ul>
     <li>
-      <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id }) %>" <%= tab_selected unless @expenses_tab or @summary_tab %>><%= l(:label_time_entries) %></a>
+      <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id }) %>" <%= tab_selected unless @expenses_tab or @invoices_tab or @summary_tab %>><%= l(:label_time_entries) %></a>
     </li>
     <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
       <% if User.current.allowed_to?(:view_expenses, @project) %>
         <li>
           <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id, :contracts_expenses => 'true' }) %>" <%= tab_selected if @expenses_tab %>><%= l(:label_expenses) %></a>
+        </li>
+        <li>
+          <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id, :contracts_invoices => 'true' }) %>" <%= tab_selected if @invoices_tab %>><%= l(:label_invoices) %></a>
         </li>
       <% end %>
       <li>
@@ -154,6 +178,8 @@
 </div>
 <% if @expenses_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) && User.current.allowed_to?(:view_expenses, @project) %>
   <%= render 'expenses_list' %>
+<% elsif @invoices_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) && User.current.allowed_to?(:view_expenses, @project) %>
+  <%= render 'invoices_list' %>
 <% elsif @summary_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) %>
   <%= render 'contract_summary' %>
 <% else %>

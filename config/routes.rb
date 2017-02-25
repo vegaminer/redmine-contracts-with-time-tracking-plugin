@@ -25,3 +25,9 @@ match 'projects/:project_id/expenses/create'                => 'contracts_expens
 match 'projects/:project_id/expenses/update/:id'            => 'contracts_expenses#update',   :via => :put
 match 'projects/:project_id/expenses/destroy/:id'           => 'contracts_expenses#destroy',   :via => :delete
 
+# Invoices
+match 'projects/:project_id/contracts/invoices/new'                   => 'contracts_invoices#new',   :via => :get
+match 'projects/:project_id/contracts/invoices/:id/edit'              => 'contracts_invoices#edit',   :via => :get
+match 'projects/:project_id/contracts/invoices/create'                => 'contracts_invoices#create',   :via => :post
+match 'projects/:project_id/contracts/invoices/update/:id'            => 'contracts_invoices#update',   :via => :put
+match 'projects/:project_id/contracts/invoices/destroy/:id'           => 'contracts_invoices#destroy',   :via => :delete

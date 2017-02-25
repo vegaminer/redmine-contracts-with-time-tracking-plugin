@@ -107,9 +107,14 @@ class ContractsController < ApplicationController
     @members = []
     @time_entries.each { |entry| @members.append(entry.user) unless @members.include?(entry.user) }
     @expenses_tab = (params[:contracts_expenses] == 'true')
+    @invoices_tab = (params[:contracts_invoices] == 'true')
     @summary_tab = (params[:contract_summary] == 'true')
     if @expenses_tab
       @expenses = @contract.contracts_expenses
+    end
+    if @invoices_tab
+      @invoices = @contract.contracts_invoices
+      @invoices = @contract.contracts_invoices
     end
     if @summary_tab
       @issues = []

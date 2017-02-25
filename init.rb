@@ -36,6 +36,10 @@ Redmine::Plugin.register :contracts do
     permission :edit_expenses,                        :contracts_expenses => [:edit, :update]
     permission :delete_expenses,                      :contracts_expenses => :destroy
     permission :view_expenses,                        :contracts_expenses => :show
+    permission :create_invoices,                      :contracts_invoices => [:new, :create]
+    permission :edit_invoices,                        :contracts_invoices => [:edit, :update]
+    permission :delete_invoices,                      :contracts_invoices => :destroy
+    permission :view_invoices,                        :contracts_invoices => :show
   end
 end
 
