@@ -178,6 +178,7 @@
     <% end %>
   </ul>
 </div>
+<form>
 <% if @expenses_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) && User.current.allowed_to?(:view_expenses, @project) %>
   <%= render 'expenses_list' %>
 <% elsif @invoices_tab && (User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price)) && User.current.allowed_to?(:view_invoices, @project) %>
@@ -187,6 +188,7 @@
 <% else %>
   <%= render 'time_entries_list' %>
 <% end %>
+</form>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'contracts', :plugin => 'contracts' %>

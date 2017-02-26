@@ -1,9 +1,15 @@
 <%= hidden_field_tag 'back_url', url_for(params) %>
+<%= hidden_field_tag 'contract_id', @contract.id %>
 <div class="autoscroll">
 <table class="time-entries-for-contract-list list">
   <thead>
     <tr>
+      <th class="checkbox hide-when-print">
+        <%= check_box_tag 'check_all', '', false, :class => 'toggle-selection',
+                          :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}" %>
+      </th>
       <th><%= l(:label_date) %></th>
+      <th><%= l(:label_current_contract) %></th>
       <th><%= l(:label_member) %></th>
       <th><%= l(:label_activity) %></th>
       <th><%= l(:label_issue) %></th>
@@ -16,8 +22,10 @@
     </tr>
   </thead>
   <% @time_entries_page.each do |time_entry| %>
-    <tr class="<%= cycle("odd", "even") %>">
+    <tr class="time-entry <%= cycle("odd", "even") %> hascontextmenu">
+      <td class="checkbox hide-when-print"><%= check_box_tag("ids[]", time_entry.id, false, :id => nil) %></td>
       <td><%= format_date(time_entry.spent_on) %></td>
+      <td><%= time_entry.contract.title unless time_entry.contract == nil %></td>
       <td><%= link_to time_entry.user.name, user_path(time_entry.user) %></td>
       <td><%= time_entry.activity.name %></td>
       <td class="comments"><%= link_to time_entry.issue, issue_path(time_entry.issue) unless !time_entry.issue %></td>
@@ -44,3 +52,5 @@
 <% unless @time_entries_page.empty? %>
     <p class="pagination"><%= pagination_links_full @entry_pages, @entry_count %></p>
 <% end %>
+
+<%= context_menu time_entries_context_menu_path %>

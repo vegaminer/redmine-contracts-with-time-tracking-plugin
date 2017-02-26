@@ -35,20 +35,61 @@ class Contract < ActiveRecord::Base
     hours_spent
   end
 
+  def smart_time_entries
+    if Setting.plugin_contracts['enable_smart_time_entries']
+
+      # Time entries that are assigned to the contract will obviously stay assigned.
+      # Unassigned time entries that fall in the dates range of the contract will also
+      # be added in.  If multiple contracts overlap, the unassigned entries will go in the
+      # oldest contract.
+
+      # We recursively get the time entries of older (lower id) contracts here.  This may get
+      # slow in case many contracts overlap in a project, but since this is really expected
+      # that many contracts will be ongoing with the same date ranges in the same project.  One
+      # should use sub projects for such cases.
+
+      # Retrieve older contracts
+      allProjectContracts = Contract.where(:project => self.project).where('id < ?', self.id)
+      # Then all the time entries that they cover.
+      otherContractsTEs = allProjectContracts.collect{|contract| contract.smart_time_entries.pluck(:id) }
+
+      # Select time entries that where either manually assigned to this contract
+      # or that have no contract but falls in the dates range of this contract
+      te = TimeEntry.where(:project => self.project)
+      # Remove time entries assigned or 'smart' assigned to other contracts
+      te = te.where("id not in (#{otherContractsTEs.join(",")})") unless otherContractsTEs.empty?
+      te = te.where("((contract_id = '#{self.id}') or (contract_id IS NULL and spent_on >= '#{self.start_date}'" + (self.end_date.nil? ? "" : " and spent_on <= '#{self.end_date}'") + "))")
+    else
+      time_entries
+    end
+  end
+
+  def self.contract_for_time_entry(time_entry)
+    return time_entry.contract unless time_entry.contract.nil?
+
+    # Take first contract that has proper date ranges and not locked
+    time_entry.project.contracts.all.order("id asc").each do |contract|
+      afterStart = time_entry.spent_on >= contract.start_date
+      beforeEnd  = contract.end_date.nil? || time_entry.spent_on <= contract.start_date
+      return contract if afterStart && beforeEnd
+    end
+    nil
+  end
+
   def hours_spent
-    self.time_entries.map(&:hours).inject(0, &:+)
+    self.smart_time_entries.map(&:hours).inject(0, &:+)
   end
 
   def hours_spent_by_user(user)
-    self.time_entries.select { |entry| entry.user == user }.map(&:hours).inject(0, &:+)
+    self.smart_time_entries.select { |entry| entry.user == user }.map(&:hours).inject(0, &:+)
   end
 
   def hours_spent_on_issue(issue)
-    self.time_entries.select { |entry| entry.issue == issue }.map(&:hours).inject(0, &:+)
+    self.smart_time_entries.select { |entry| entry.issue == issue }.map(&:hours).inject(0, &:+)
   end
 
   def amount_spent_on_issue(issue)
-    time_entries = self.time_entries.select { |entry| entry.issue == issue }
+    time_entries = self.smart_time_entries.select { |entry| entry.issue == issue }
     total_amount = 0
     time_entries.each do |entry|
       total_amount += entry.hours * self.user_contract_rate_or_default(entry.user)
@@ -65,7 +106,7 @@ class Contract < ActiveRecord::Base
   end
 
   def billable_amount_for_user(user)
-    member_hours = self.time_entries.select { |entry| entry.user == user }.map(&:hours).inject(0, &:+)
+    member_hours = self.smart_time_entries.select { |entry| entry.user == user }.map(&:hours).inject(0, &:+)
     member_rate = self.user_contract_rate_or_default(user)
     member_hours * member_rate
   end
@@ -94,7 +135,7 @@ class Contract < ActiveRecord::Base
     return 0 if members.empty?
     total_billable_amount = 0
     members.each do |member|
-      member_hours = self.time_entries.select { |entry| entry.user_id == member.id }.map(&:hours).inject(0, &:+)
+      member_hours = self.smart_time_entries.select { |entry| entry.user_id == member.id }.map(&:hours).inject(0, &:+)
       member_rate = self.user_contract_rate_or_default(member)
       billable_amount = member_hours * member_rate
       total_billable_amount += billable_amount
@@ -146,8 +187,8 @@ class Contract < ActiveRecord::Base
   end
 
   def members_with_entries
-    return [] if self.time_entries.empty?
-    uniq_user_ids = self.time_entries.collect { |entry| entry.user_id }.uniq
+    return [] if self.smart_time_entries.empty?
+    uniq_user_ids = self.smart_time_entries.collect { |entry| entry.user_id }.uniq
     return [] if uniq_user_ids.nil?
     User.find(uniq_user_ids)
   end

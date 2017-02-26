@@ -103,7 +103,7 @@ class ContractsController < ApplicationController
 
   def show
     @contract = Contract.find(params[:id])
-    @time_entries = @contract.time_entries.order("spent_on DESC")
+    @time_entries = @contract.smart_time_entries.order("spent_on DESC")
     @members = []
     @time_entries.each { |entry| @members.append(entry.user) unless @members.include?(entry.user) }
     @expenses_tab = (params[:contracts_expenses] == 'true')
@@ -170,24 +170,32 @@ class ContractsController < ApplicationController
   def add_time_entries
     @contract = Contract.find(params[:id])
     @project = @contract.project
-    @time_entries = @contract.project.time_entries_for_all_descendant_projects.sort_by! { |entry| entry.spent_on }
+    @time_entries = @contract.project.time_entries_for_all_descendant_projects.order("spent_on ASC")
   end
 
   def assoc_time_entries_with_contract
     @contract = Contract.find(params[:id])
-    @project = @contract.project
     time_entries = params[:time_entries]
     if time_entries != nil
-      time_entries.each do |time_entry| 
-        updated_time_entry = TimeEntry.find(time_entry.first)
+      time_entries.each do |time_entry|
+        updated_time_entry = TimeEntry.find(time_entry)
         updated_time_entry.contract = @contract
         updated_time_entry.save
       end
     end
-    unless @contract.hours_remaining >= 0
+    # Can also unassociate
+    time_entries = params[:unassoc_time_entries]
+    if time_entries != nil
+      time_entries.each do |time_entry|
+        updated_time_entry = TimeEntry.find(time_entry)
+        updated_time_entry.contract = nil
+        updated_time_entry.save
+      end
+    end
+    unless @contract.nil? || @contract.hours_remaining >= 0
       flash[:error] = l(:text_hours_over_contract, :hours_over => l_hours(-1 * @contract.hours_remaining))
     end
-    redirect_to "/projects/#{@contract.project.id}/contracts/#{@contract.id}" 
+    redirect_back_or_default url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })
   end
 
   def lock

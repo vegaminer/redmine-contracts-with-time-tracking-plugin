@@ -97,6 +97,8 @@ en:
   text_hours_over_contract: "You are now %{hours_over} over the contract's limit."
   text_split_time_entry_saved: Your time entry has been split into two entries because it exceeded the remaining time on the selected contract. The second entry has been added to a new pending contract.
   text_one_time_entry_saved: A new pending contract was created and your time entry was saved there because the contract you selected did not have any remaining time.
+  text_time_entry_added_to_contract: "The time entry will appear in the following contract: %{contract}."
+  text_time_entry_not_added_to_contract: "The time entry will not appear in any contract."
   text_hours_too_large: is invalid. The amount exceeds the time remaining plus the size of a new contract.
   text_invalid_rate: "Contractor rate must be zero or greater."
   text_invalid_issue_id: "is not a valid issue ID"
@@ -145,5 +147,13 @@ en:
   field_issue: Issue (ID)
   field_unbilled: Unbilled
   field_invoiced: Invoiced
+
+  button_assign: Assign to contract
+  button_unassign: Unassign from contract
+  button_unassign_multiple: Unassign from contracts
+  button_assign_contract: 'Assign to %{contract}'
+  button_unassign_contract: 'Unassign from %{contract}'
+
+  settings_enable_smart_time_entries: Include all time entries in the project that fall in the contract dates range
 
   enumeration_contract_categories: Contract categories

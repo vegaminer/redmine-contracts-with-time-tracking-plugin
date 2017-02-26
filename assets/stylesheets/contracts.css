@@ -93,3 +93,12 @@ div.flash.contract {
   border-color: #9fcf9f;
   color: #005f00;
 }
+
+div.flash.contract_warning {
+  background: url(../../../images/warning.png) 8px 5px no-repeat;
+  background-color: #FFEBC1;
+  border-color: #FDBF3B;
+  color: #A6750C;
+}
+
+.icon-link { background-image: url(../../../images/link.png); }

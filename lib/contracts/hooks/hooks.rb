@@ -2,6 +2,7 @@ module Contracts
   class ContractsHookListener < Redmine::Hook::ViewListener
   
     def view_timelog_edit_form_bottom(context={})
+      return if Setting.plugin_contracts['enable_smart_time_entries']
       if context[:time_entry].project_id != nil
         @current_project = Project.find(context[:time_entry].project_id)
         @contracts = @current_project.contracts_for_all_ancestor_projects
@@ -46,6 +47,14 @@ module Contracts
       else
         "<p>This page will not work due to the contracts plugin. You must log time entries from within a project."
       end
+    end
+
+    render_on :view_time_entries_context_menu_end, :partial => "contracts/context_menus/assign_time_entries"
+  end
+
+  class ViewsLayoutsHook < Redmine::Hook::ViewListener
+    def view_layouts_base_html_head(context={})
+      return stylesheet_link_tag(:contracts, :plugin => 'contracts')
     end
   end
 end

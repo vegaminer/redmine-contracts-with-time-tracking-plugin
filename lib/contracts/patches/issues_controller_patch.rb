@@ -1,8 +1,8 @@
-require_dependency 'timelog_controller'
+require_dependency 'issues_controller'
 
 module Contracts
 
-	module TimelogControllerPatch
+	module IssuesControllerPatch
 		def self.included(base)
 	  		base.class_eval do
 	  			after_filter :check_flash_messages, :only => [:create, :update]

@@ -1,0 +1,25 @@
+<% if User.current.allowed_to?(:edit_contracts, @project) %>
+  <li class="folder">
+    <a href="#" class="submenu"><%= l(:label_contract) %></a>
+    <ul>
+      <% te_with_contract = time_entries.select { |te| !te.contract.nil? } %>
+      <% unique_contract_assigned = (te_with_contract.uniq{|te| te.contract.id}.count == 1) ? te_with_contract[0].contract : nil %>
+      <% # If some time entries have an assigned contract, offer to unassign %>
+      <% if !te_with_contract.empty? %>
+        <% if unique_contract_assigned.nil? %>
+          <% # Assigned to different contracts.  Write generic "Unassign from contracts" %>
+          <li><%= context_menu_link l(:button_unassign_multiple), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => te_with_contract[0].contract_id, :project_id => @project, :unassoc_time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link-break', :method => "put" %></li>
+        <% else %>
+          <% # All assigned to the same.  Write its name. %>
+          <li><%= context_menu_link l(:button_unassign_contract, :contract => te_with_contract[0].contract.title), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => te_with_contract[0].contract_id, :project_id => @project, :unassoc_time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link-break', :method => "put" %></li>
+        <% end %>
+      <% end %>
+      <% # Add menus to assign to other contract(s) %>
+      <% @project.contracts.each do |contract| %>
+        <% if contract != unique_contract_assigned %>
+          <li><%= context_menu_link l(:button_assign_contract, :contract => contract.title), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => contract, :project_id => @project, :time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link', :method => "put" %></li>
+        <% end %>
+      <% end %>
+    </ul>
+  </li>
+<% end  %>
