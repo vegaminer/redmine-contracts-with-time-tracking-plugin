@@ -131,7 +131,7 @@ class ContractsController < ApplicationController
 
   def show
     @contract = Contract.find(params[:id])
-    @time_entries = @contract.smart_time_entries.order("spent_on DESC")
+    @time_entries = @contract.smart_time_entries.order("spent_on DESC, id DESC")
     @members = []
     @time_entries.each { |entry| @members.append(entry.user) unless @members.include?(entry.user) }
     @expenses_tab = (params[:contracts_expenses] == 'true')
