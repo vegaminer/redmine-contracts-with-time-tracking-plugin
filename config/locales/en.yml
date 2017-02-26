@@ -117,6 +117,8 @@ en:
   text_locked_contract_cache_updated: This entry is associated with a locked contract. The contract's cached values have been updated to reflect your changes.
   text_expenses_uneditable: Expenses for this contract are not editable (contract is locked).
   text_invoices_uneditable: Invoices for this contract are not editable (contract is locked).
+  text_contract_is_locked: This operation cannot be performed (contract is locked).
+  text_some_contracts_are_locked: Not all operations could be performed (some contracts are locked).
   text_expense_deleted: Expense deleted.
   text_invoice_deleted: Invoice deleted.
   text_apply: Apply

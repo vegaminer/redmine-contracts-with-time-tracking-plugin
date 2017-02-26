@@ -203,12 +203,18 @@ class ContractsController < ApplicationController
 
   def assoc_time_entries_with_contract
     @contract = Contract.find(params[:id])
+    changeCount = 0
+    successCount = 0
     time_entries = params[:time_entries]
     if time_entries != nil
       time_entries.each do |time_entry|
         updated_time_entry = TimeEntry.find(time_entry)
-        updated_time_entry.contract = @contract
-        updated_time_entry.save
+        changeCount += 1
+        if (updated_time_entry.contract && !updated_time_entry.contract.is_locked && !@contract.is_locked)
+          updated_time_entry.contract = @contract
+          updated_time_entry.save
+          successCount += 1
+        end
       end
     end
     # Can also unassociate
@@ -216,13 +222,23 @@ class ContractsController < ApplicationController
     if time_entries != nil
       time_entries.each do |time_entry|
         updated_time_entry = TimeEntry.find(time_entry)
-        updated_time_entry.contract = nil
-        updated_time_entry.save
+        changeCount += 1
+        if (updated_time_entry.contract && !updated_time_entry.contract.is_locked)
+          updated_time_entry.contract = nil
+          updated_time_entry.save
+          successCount += 1
+        end
       end
     end
+
+    if successCount != changeCount
+      flash[:warning] = l(:text_some_contracts_are_locked)
+    end
+
     unless @contract.nil? || @contract.hours_remaining >= 0
       flash[:error] = l(:text_hours_over_contract, :hours_over => l_hours(-1 * @contract.hours_remaining))
     end
+
     redirect_back_or_default url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })
   end
 
@@ -230,6 +246,14 @@ class ContractsController < ApplicationController
     @contract = Contract.find(params[:id])
     @lock = (params[:lock] == 'true')
     if @lock
+      # Associate all time entries to the contract because a locked
+      # contract will not receive 'smart' time entries anymore and those
+      # that were 'smartly' associated must stay.
+      if Setting.plugin_contracts['enable_smart_time_entries']
+        @contract.smart_time_entries.each do |time_entry|
+          time_entry.update_attribute(:contract, @contract)
+        end
+      end
       @contract.update_attribute(:is_locked, @lock)
       flash[:notice] = l(:text_contract_locked)
     else

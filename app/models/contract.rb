@@ -58,7 +58,11 @@ class Contract < ActiveRecord::Base
       te = TimeEntry.where(:project => self.project)
       # Remove time entries assigned or 'smart' assigned to other contracts
       te = te.where("id not in (#{otherContractsTEs.join(",")})") unless otherContractsTEs.empty?
-      te = te.where("((contract_id = '#{self.id}') or (contract_id IS NULL and spent_on >= '#{self.start_date}'" + (self.end_date.nil? ? "" : " and spent_on <= '#{self.end_date}'") + "))")
+      if self.is_locked
+        te = te.where("(contract_id = '#{self.id}')")
+      else
+        te = te.where("((contract_id = '#{self.id}') or (contract_id IS NULL and spent_on >= '#{self.start_date}'" + (self.end_date.nil? ? "" : " and spent_on <= '#{self.end_date}'") + "))")
+      end
     else
       time_entries
     end
@@ -71,7 +75,7 @@ class Contract < ActiveRecord::Base
     time_entry.project.contracts.all.order("id asc").each do |contract|
       afterStart = time_entry.spent_on >= contract.start_date
       beforeEnd  = contract.end_date.nil? || time_entry.spent_on <= contract.start_date
-      return contract if afterStart && beforeEnd
+      return contract if !contract.is_locked && afterStart && beforeEnd
     end
     nil
   end
