@@ -3,10 +3,10 @@
     <%= link_to l(:button_log_time), new_project_time_entry_path(@project), :class => 'icon icon-time' %> &nbsp;&nbsp;&nbsp;
   <% end %>
   <% if !@contract.is_locked && User.current.allowed_to?(:create_expenses, @project) %>
-    <%= link_to l(:label_add_expense), { :controller => 'contracts_expenses', :action => 'new', :project_id => @project.identifier }, :class => 'icon icon-add' %> &nbsp;&nbsp;&nbsp;
+    <%= link_to l(:label_add_expense), { :controller => 'contracts_expenses', :action => 'new', :project_id => @project.identifier, :contract_id => @contract.id }, :class => 'icon icon-add' %> &nbsp;&nbsp;&nbsp;
   <% end %>
   <% if !@contract.is_locked && User.current.allowed_to?(:create_invoices, @project) %>
-    <%= link_to l(:label_add_invoice), { :controller => 'contracts_invoices', :action => 'new', :project_id => @project.identifier }, :class => 'icon icon-add' %> &nbsp;&nbsp;&nbsp;
+    <%= link_to l(:label_add_invoice), { :controller => 'contracts_invoices', :action => 'new', :project_id => @project.identifier, :contract_id => @contract.id }, :class => 'icon icon-add' %> &nbsp;&nbsp;&nbsp;
   <% end %>
 </div>
 

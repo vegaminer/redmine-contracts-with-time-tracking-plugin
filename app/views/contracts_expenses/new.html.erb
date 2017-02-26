@@ -1,3 +1,8 @@
-<h1><%= l(:label_new_expense) %></h1>
+<h2>
+  <% if @contracts_expense.contract %>
+    <%= link_to @contracts_expense.contract.title, {:controller => 'contracts', :action => 'show', :project_id => @contracts_expense.contract.project.identifier, :id => @contracts_expense.contract.id } %> »
+  <% end %>
+  <%= l(:label_new_expense) %>
+</h2>
 
 <%= render 'form' %>

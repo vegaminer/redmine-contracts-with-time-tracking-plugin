@@ -4,6 +4,8 @@ class ContractsInvoicesController < ApplicationController
 
   def new
     @contracts_invoice = ContractsInvoice.new
+    # If creating an invoice from a contract (the usual case), use the provided contract_id (if any)
+    @contracts_invoice.contract_id = params[:contract_id]
     load_contracts
   end
 

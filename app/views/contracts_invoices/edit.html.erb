@@ -1,3 +1,8 @@
-<h1><%= l(:label_edit_invoice) %></h1>
+<h2>
+  <% if @contracts_invoice.contract %>
+    <%= link_to @contracts_invoice.contract.title, {:controller => 'contracts', :action => 'show', :project_id => @contracts_invoice.contract.project.identifier, :id => @contracts_invoice.contract.id } %> »
+  <% end %>
+  <%= l(:label_edit_invoice) %>
+</h2>
 
 <%= render 'form' %>
