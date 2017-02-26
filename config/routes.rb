@@ -6,6 +6,7 @@ match 'contracts/all'                                       => 'contracts#all', 
 match 'contracts/:id'                                       => 'contracts#destroy', :via => :delete
 match 'contracts/:id/edit'                                  => 'contracts#edit',    :via => :get
 match 'projects/:project_id/contracts'                      => 'contracts#index',   :via => :get
+match 'projects/:project_id/contracts/default'              => 'contracts#default', :via => :get
 match 'projects/:project_id/contracts/new'                  => 'contracts#new',     :via => :get
 match 'projects/:project_id/contracts/:id/edit'             => 'contracts#edit',    :via => :get
 match 'projects/:project_id/contracts/:id'                  => 'contracts#show',    :via => :get
@@ -31,3 +32,5 @@ match 'projects/:project_id/contracts/invoices/:id/edit'              => 'contra
 match 'projects/:project_id/contracts/invoices/create'                => 'contracts_invoices#create',   :via => :post
 match 'projects/:project_id/contracts/invoices/update/:id'            => 'contracts_invoices#update',   :via => :put
 match 'projects/:project_id/contracts/invoices/destroy/:id'           => 'contracts_invoices#destroy',   :via => :delete
+
+match 'projects/:project_id/contracts/invoices/context_menu', :to => 'contracts_invoices#context_menu', :as => :contracts_invoices_context_menu_path, :via => [:get, :post]

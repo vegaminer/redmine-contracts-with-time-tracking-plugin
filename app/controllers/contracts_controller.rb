@@ -1,7 +1,9 @@
 class ContractsController < ApplicationController
   before_filter :find_project, :authorize, :only => [:index, :show, :new, :create, :edit, :update, :destroy, 
                                                      :add_time_entries, :assoc_time_entries_with_contract]
-  
+
+  Struct.new("DefaultContract", :project, :hours)
+
   def index
     @project = Project.find(params[:project_id])
 
@@ -31,8 +33,34 @@ class ContractsController < ApplicationController
     @total_amount_remaining_hourly = hourly_contracts.map(&:amount_remaining).inject(0, &:+)
     @total_remaining_hours = hourly_contracts.map(&:hours_remaining).inject(0, &:+)
 
+    @defaultContracts = []
+
+    # all time entries
+    te = TimeEntry.where(:project_id => @project)
+    Contract.where(:project_id => @project).each do |contract|
+      te -= contract.smart_time_entries
+    end
+
+    unless te.empty?
+      @defaultContracts << Struct::DefaultContract.new(@project, te.sum { |entry| entry.hours })
+    end
+
     set_contract_visibility
 
+  end
+
+  def default
+    @project = Project.find(params[:project_id])
+
+    # all time entries
+    @time_entries = TimeEntry.where(:project_id => @project)
+    Contract.where(:project_id => @project).each do |contract|
+      @time_entries -= contract.smart_time_entries
+    end
+
+    @entry_count = @time_entries.count
+    @entry_pages = Paginator.new @entry_count, per_page_option, params['page']
+    @time_entries_page = @time_entries[@entry_pages.offset, @entry_pages.per_page]
   end
 
   def all

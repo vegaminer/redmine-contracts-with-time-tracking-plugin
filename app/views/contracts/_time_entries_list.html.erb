@@ -1,5 +1,5 @@
 <%= hidden_field_tag 'back_url', url_for(params) %>
-<%= hidden_field_tag 'contract_id', @contract.id %>
+<%= hidden_field_tag 'contract_id', @contract.id unless @contract.nil? %>
 <div class="autoscroll">
 <table class="time-entries-for-contract-list list">
   <thead>
@@ -14,7 +14,7 @@
       <th><%= l(:label_activity) %></th>
       <th><%= l(:label_issue) %></th>
       <th><%= l(:label_comments) %></th>
-      <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
+      <% if User.current.allowed_to?(:view_time_entries, @project) && (@contract.nil? || !@contract.is_fixed_price) %>
         <th><%= l(:label_hours) %></th>
       <% end %>
       <th></th>
@@ -29,14 +29,14 @@
       <td><%= time_entry.activity.name %></td>
       <td class="comments"><%= link_to time_entry.issue, issue_path(time_entry.issue) unless !time_entry.issue %></td>
       <td class="comments"><%= time_entry.comments %></td>
-      <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
+      <% if User.current.allowed_to?(:view_time_entries, @project) && (@contract.nil? || !@contract.is_fixed_price) %>
         <td><%= time_entry.hours %></td>
       <% end %>
       <td class="buttons">
-        <% if !@contract.is_locked && User.current.allowed_to?(:edit_time_entries, @project) -%>
+        <% if (@contract.nil? || !@contract.is_locked) && User.current.allowed_to?(:edit_time_entries, @project) -%>
           <%= link_to image_tag("edit.png"), edit_time_entry_path(time_entry), :title => l(:label_edit) %>
         <% end %>
-        <% if !@contract.is_locked && User.current.allowed_to?(:edit_time_entries, @project) -%>
+        <% if (@contract.nil? || !@contract.is_locked) && User.current.allowed_to?(:edit_time_entries, @project) -%>
           <%= link_to image_tag("delete.png"), time_entry_path(time_entry), 
             :title => l(:label_delete), :data => {:confirm => l(:text_are_you_sure_delete_time_entry)}, :method => :delete %>
         <% end %>

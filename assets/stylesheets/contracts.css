@@ -65,11 +65,11 @@ table.hours-summary th.member {
   text-align: left;
   padding-left: 4px;
 }
-table.hours-summary th.hours, table.hours-summary th.amount {
+table.hours-summary th.hours, table.hours-summary th.amount, table.contracts-list th.hours, table.contracts-list th.amount {
   text-align: right;
   padding-right: 4px;
 }
-table.hours-summary td.hours, table.hours-summary td.amount {
+table.hours-summary td.hours, table.hours-summary td.amount, table.contracts-list td.hours, table.contracts-list td.amount {
   font-weight: normal;
   text-align: right;
   padding-right: 4px;
@@ -82,7 +82,7 @@ table.hours-summary td.member {
   padding-left: 4px;
 }
 
-fieldset#contractor_rates { 
+fieldset#contractor_rates {
   width: 500px;
 }
 

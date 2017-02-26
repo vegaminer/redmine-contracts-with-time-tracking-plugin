@@ -48,14 +48,14 @@
             <% end %>
           <% end %>
         </td>
-        <td><%= number_to_currency(contract.purchase_amount) %></td>
+        <td class="amount"><%= number_to_currency(contract.purchase_amount) %></td>
         <% if (@project != nil) && (User.current.allowed_to?(:view_hourly_rate, contract.project)) %>
-          <td><%= number_to_currency(contract.hourly_rate) %></td>
+          <td class="amount"><%= number_to_currency(contract.hourly_rate) %></td>
         <% end %>
-        <td><%= number_to_currency(contract.expenses_total) %></td>
-        <td class="green"><%= number_to_currency(contract.amount_remaining) %></td>
-        <td><%= number_with_precision contract.smart_hours_spent, :precision => 2 %></td>
-        <td class="blue"><%= number_with_precision contract.hours_remaining, :precision => 2 %></td>
+        <td class="amount"><%= number_to_currency(contract.expenses_total) %></td>
+        <td class="amount green"><%= number_to_currency(contract.amount_remaining) %></td>
+        <td class="hours"><%= number_with_precision contract.smart_hours_spent, :precision => 2 %></td>
+        <td class="hours blue"><%= number_with_precision contract.hours_remaining, :precision => 2 %></td>
         <td>
           <% if !contract.contract_url.blank? %>
             <%= link_to image_tag("/images/files/text.png"), contract.contract_url %>
@@ -78,7 +78,7 @@
         <td>
           <% if !contract.is_locked && User.current.allowed_to?(:edit_contracts, contract.project) %>
             <%= link_to image_tag("edit.png"), { :controller => 'contracts', :action => 'edit', :project_id => contract.project.identifier, :id => contract.id }, :title => l(:label_edit) %>
-        <% end %>
+          <% end %>
         </td>
         <td>
           <% if !contract.is_locked && (User.current.allowed_to?(:delete_contracts, contract.project)) %>
@@ -89,5 +89,29 @@
       </tr>
     <% end %>
   <% end %>
+
+  <% @defaultContracts.each do |contract| %>
+      <tr class="<%= cycle("odd", "even") %>">
+        <td>
+          <%= link_to '[[ default contract ]]', {:controller => 'contracts', :action => 'default', :project_id => contract.project.identifier } %>
+        </td>
+        <td></td>
+        <td></td>
+        <% if (@project != nil) && (User.current.allowed_to?(:view_hourly_rate, @project)) %>
+          <td></td>
+        <% end %>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="hours"><%= number_with_precision(contract.hours, :precision => 2) %></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+  <% end %>
+
 </table>
 
