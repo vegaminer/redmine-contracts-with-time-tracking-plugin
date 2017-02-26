@@ -8,7 +8,6 @@
       <th><%= l(:label_amount) %></th>
       <th><%= l(:label_contract) %></th>
       <th></th>
-      <th></th>
     </tr>
   </thead>
   <% @invoices.each do |invoice| %>
@@ -17,19 +16,16 @@
       <td><%= link_to invoice.invoice_number, invoice_edit_urlpath(@contract, invoice) %></td>
       <td><%= number_to_currency(invoice.amount) %></td>
       <td><%= link_to invoice.contract.title, { :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id } %></td>
-      <td>
+      <td class="buttons">
         <% if !@contract.is_locked && User.current.allowed_to?(:edit_invoices, @project) %>
           <%= link_to image_tag("edit.png"), invoice_edit_urlpath(@contract, invoice), :title => l(:label_edit) %>
         <% end %>
-      </td>
-      <td>
         <% if !@contract.is_locked && User.current.allowed_to?(:delete_invoices, @project) %>
           <%= link_to image_tag("delete.png"), { :controller => 'contracts_invoices', :action => 'destroy',
             :project_id => @contract.project.identifier, :id => invoice.id },
             :title => l(:label_delete), :data => {:confirm => l(:text_are_you_sure_delete_invoice)}, :method => :delete %>
         <% end %>
       </td>
-
     </tr>
   <% end %>
 </table>
