@@ -151,11 +151,11 @@ en:
   field_unbilled: Unbilled
   field_invoiced: Invoiced
 
-  button_assign: Assign to contract
-  button_unassign: Unassign from contract
-  button_unassign_multiple: Unassign from contracts
-  button_assign_contract: 'Assign to %{contract}'
-  button_unassign_contract: 'Unassign from %{contract}'
+  button_assign: Associate to contract
+  button_unassign: Unassociate from contract
+  button_unassign_multiple: Unassociate from contracts
+  button_assign_contract: 'Associate to %{contract}'
+  button_unassign_contract: 'Unassociate from %{contract}'
 
   settings_enable_smart_time_entries: Include all time entries in the project that fall in the contract dates range
 
