@@ -119,6 +119,7 @@ en:
   text_invoices_uneditable: Invoices for this contract are not editable (contract is locked).
   text_contract_is_locked: This operation cannot be performed (contract is locked).
   text_some_contracts_are_locked: Not all operations could be performed (some contracts are locked).
+  text_some_time_entries_were_added: Some unassociated time entries will now appear in %{contract}.  Please review the contract.
   text_expense_deleted: Expense deleted.
   text_invoice_deleted: Invoice deleted.
   text_apply: Apply

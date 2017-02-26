@@ -260,11 +260,16 @@ class ContractsController < ApplicationController
       @contract.update_attribute(:is_locked, @lock)
       flash[:notice] = l(:text_contract_locked)
     else
+      teCountBefore = @contract.smart_time_entries.count
       @contract.is_locked = false
       @contract.hours_worked = nil
       @contract.billable_amount_total = nil
       @contract.save!
+      teCountAfter = @contract.smart_time_entries.count
       flash[:notice] = l(:text_contract_unlocked)
+      if (teCountAfter != teCountBefore)
+        flash[:warning] = l(:text_some_time_entries_were_added, :contract => view_context.link_to(@contract.title, url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })))
+      end
     end
 
     if params[:view] == 'index'
