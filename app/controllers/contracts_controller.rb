@@ -210,7 +210,9 @@ class ContractsController < ApplicationController
       time_entries.each do |time_entry|
         updated_time_entry = TimeEntry.find(time_entry)
         changeCount += 1
-        if (updated_time_entry.contract && !updated_time_entry.contract.is_locked && !@contract.is_locked)
+        # We can change if the time entry has either no contract or its contract is not locked
+        # and the contract we want to associate to is not locked neither.
+        if ((updated_time_entry.contract.nil? || !updated_time_entry.contract.is_locked) && !@contract.is_locked)
           updated_time_entry.contract = @contract
           updated_time_entry.save
           successCount += 1
@@ -223,7 +225,8 @@ class ContractsController < ApplicationController
       time_entries.each do |time_entry|
         updated_time_entry = TimeEntry.find(time_entry)
         changeCount += 1
-        if (updated_time_entry.contract && !updated_time_entry.contract.is_locked)
+        # We can change if the time entry has either no contract or its contract is not locked
+        if (updated_time_entry.contract.nil? || !updated_time_entry.contract.is_locked)
           updated_time_entry.contract = nil
           updated_time_entry.save
           successCount += 1
