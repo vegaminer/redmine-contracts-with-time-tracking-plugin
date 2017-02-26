@@ -17,7 +17,7 @@
   padding-right: 0px;
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 899px) {
   .child
   {
     width:100%;
@@ -26,6 +26,23 @@
   .parent
   {
     white-space: normal;
+  }
+
+  /* Almost as-is from responsive.css */
+  a.buttons  {
+    font-weight: bold;
+
+    display: inline-block;
+
+    margin: 5px 0;
+    margin-right: 2px;
+    padding: 9px 9px 9px 9px;
+
+    border: 1px solid #ddd;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: transparent;
+    background-position-x: 4px;
   }
 }
 
