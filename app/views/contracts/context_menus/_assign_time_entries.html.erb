@@ -15,7 +15,7 @@
         <% end %>
       <% end %>
       <% # Add menus to assign to other contract(s) %>
-      <% @project.contracts.each do |contract| %>
+      <% @project.contracts.order("id ASC").each do |contract| %>
         <% if contract != unique_contract_assigned %>
           <li><%= context_menu_link l(:button_assign_contract, :contract => contract.title), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => contract, :project_id => @project, :time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link', :method => "put" %></li>
         <% end %>
