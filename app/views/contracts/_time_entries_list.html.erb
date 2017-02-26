@@ -47,7 +47,7 @@
 </div>
 
 <% unless @time_entries_page.empty? %>
-    <p class="pagination"><%= pagination_links_full @entry_pages, @entry_count %></p>
+    <span class="pagination"><%= pagination_links_full @entry_pages, @entry_count %></span>
 <% end %>
 
 <%= context_menu time_entries_context_menu_path %>
