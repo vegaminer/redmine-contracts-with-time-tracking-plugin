@@ -65,7 +65,7 @@ class ContractsController < ApplicationController
 
   def all
     user = User.current
-    projects = user.projects.select { |project| user.allowed_to?(:view_all_contracts_for_project, project) }
+    projects = Project.select { |project| user.allowed_to?(:view_all_contracts_for_project, project) }
 
     fixed_contracts = projects.collect { |project| project.contracts.order("start_date ASC").where(:is_fixed_price => '1') }
     fixed_contracts.flatten!
@@ -96,7 +96,21 @@ class ContractsController < ApplicationController
     @total_remaining_hours = hourly_contracts.sum { |contract| contract.hours_remaining }
 
     set_contract_visibility
-    
+
+    @defaultContracts = []
+
+    # all time entries
+    te = TimeEntry.visible
+    Contract.all.each do |contract|
+      te -= contract.smart_time_entries
+    end
+
+    unless te.empty?
+      te.uniq{|te| te.project }.each do |te_project|
+        @defaultContracts << Struct::DefaultContract.new(te_project.project, te.select { |te| te.project == te_project.project }.sum { |entry| entry.hours })
+      end
+    end
+
     render "index"
   end
 
