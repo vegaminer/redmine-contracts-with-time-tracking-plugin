@@ -51,7 +51,7 @@ class Contract < ActiveRecord::Base
       # Retrieve older contracts
       allProjectContracts = Contract.where(:project => self.project).where('id < ?', self.id)
       # Then all the time entries that they cover.
-      otherContractsTEs = allProjectContracts.collect{|contract| contract.smart_time_entries.pluck(:id) }
+      otherContractsTEs = allProjectContracts.collect{|contract| contract.smart_time_entries.pluck(:id) }.flatten
 
       # Select time entries that where either manually assigned to this contract
       # or that have no contract but falls in the dates range of this contract
