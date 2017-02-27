@@ -5,9 +5,10 @@ module Contracts
 	module IssuesControllerPatch
 		def self.included(base)
 	  		base.class_eval do
-	  			after_filter :check_flash_messages, :only => [:create, :update]
+	  			after_filter :check_flash_messages, :only => [:update]
 
 	  			def check_flash_messages
+					return if @time_entry.nil?
 	  				if @time_entry.flash_only_one_time_entry
 	  					flash[:contract] = l(:text_one_time_entry_saved)
 	  				elsif @time_entry.flash_time_entry_success
