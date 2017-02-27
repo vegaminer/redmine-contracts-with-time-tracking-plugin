@@ -20,7 +20,7 @@
       <tr class="<%= cycle("odd", "even") %>">
         <% ((time_entry.contract != nil) && (time_entry.contract.id == @contract.id)) ? if_disabled = true : if_disabled = false %>
         <% ((time_entry.contract != nil) && (time_entry.contract.id == @contract.id)) ? if_checked  = true : if_checked = false %>
-        <td><%= check_box_tag("time_entries[#{time_entry.id}]", "1", if_checked, :disabled => if_disabled) %></td>
+        <td><%= check_box_tag("time_entries[]", time_entry.id, if_checked, :disabled => if_disabled) %></td>
         <td><%= format_date(time_entry.spent_on) %></td>
         <td><%= time_entry.contract.title unless time_entry.contract == nil %></td>
         <td><%= link_to time_entry.user.name, user_path(time_entry.user) %></td>
