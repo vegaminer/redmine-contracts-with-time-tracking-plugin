@@ -1,0 +1,44 @@
+<%
+if @contracts_invoice.new_record?
+  url = url_for({ :controller => 'contracts_invoices', :action => 'create', :project_id => @project.identifier})
+  method = :post
+else
+  url = url_for({ :controller => 'contracts_invoices', :action => 'update', :project_id => @project.identifier})
+  method = :put
+end
+%>
+<%= labelled_form_for @contracts_invoice, :url => url, :method => method do |f| %>
+  <% if @contracts_invoice.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contracts_invoice.errors.count, "error") %> prohibited this invoice from being saved:</h2>
+
+      <ul>
+      <% @contracts_invoice.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="box tabular">
+    <p>
+      <%= f.date_field :invoice_date, :size => 12, :required => true %>
+      <%= calendar_for('contracts_invoice_invoice_date') %>
+    </p>
+    <p>
+      <%= f.text_field :invoice_number, :size => 6, :required => true %>
+    </p>
+    <p><%= f.text_field :amount, :size => 6, :required => true %></p>
+    <p>
+      <label for="contracts_invoice_contract_id"><%= l(:field_invoice_contract) %><%= span_required %></label>
+      <%-# If no default contract, then it indicates this is a new invoice. Populate dropdown with last created contract -%>
+      <% if @contracts_invoice.contract_id == nil %>
+        <% @contracts_invoice.contract_id = @project.contracts.maximum(:id) %>
+      <% end %>
+      <% @contracts = @project.contracts_for_all_ancestor_projects %>
+      <%= select("contracts_invoice", "contract_id", @contracts.collect { |c| [ c.title, c.id ] }, {:include_blank => l(:label_select_contract)}) %>
+    </p>
+  </div>
+  <%= f.submit l(:label_save_invoice) %>
+
+<% end %>

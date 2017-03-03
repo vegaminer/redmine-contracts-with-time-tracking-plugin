@@ -1,7 +1,9 @@
 class ContractsController < ApplicationController
   before_filter :find_project, :authorize, :only => [:index, :show, :new, :create, :edit, :update, :destroy, 
                                                      :add_time_entries, :assoc_time_entries_with_contract]
-  
+
+  Struct.new("DefaultContract", :project, :hours)
+
   def index
     @project = Project.find(params[:project_id])
 
@@ -31,13 +33,39 @@ class ContractsController < ApplicationController
     @total_amount_remaining_hourly = hourly_contracts.map(&:amount_remaining).inject(0, &:+)
     @total_remaining_hours = hourly_contracts.map(&:hours_remaining).inject(0, &:+)
 
+    @defaultContracts = []
+
+    # all time entries
+    te = TimeEntry.where(:project_id => @project)
+    Contract.where(:project_id => @project).each do |contract|
+      te -= contract.smart_time_entries
+    end
+
+    unless te.empty?
+      @defaultContracts << Struct::DefaultContract.new(@project, te.sum { |entry| entry.hours })
+    end
+
     set_contract_visibility
 
   end
 
+  def default
+    @project = Project.find(params[:project_id])
+
+    # all time entries
+    @time_entries = TimeEntry.where(:project_id => @project)
+    Contract.where(:project_id => @project).each do |contract|
+      @time_entries -= contract.smart_time_entries
+    end
+
+    @entry_count = @time_entries.count
+    @entry_pages = Paginator.new @entry_count, per_page_option, params['page']
+    @time_entries_page = @time_entries[@entry_pages.offset, @entry_pages.per_page]
+  end
+
   def all
     user = User.current
-    projects = user.projects.select { |project| user.allowed_to?(:view_all_contracts_for_project, project) }
+    projects = Project.select { |project| user.allowed_to?(:view_all_contracts_for_project, project) }
 
     fixed_contracts = projects.collect { |project| project.contracts.order("start_date ASC").where(:is_fixed_price => '1') }
     fixed_contracts.flatten!
@@ -68,7 +96,21 @@ class ContractsController < ApplicationController
     @total_remaining_hours = hourly_contracts.sum { |contract| contract.hours_remaining }
 
     set_contract_visibility
-    
+
+    @defaultContracts = []
+
+    # all time entries
+    te = TimeEntry.visible
+    Contract.all.each do |contract|
+      te -= contract.smart_time_entries
+    end
+
+    unless te.empty?
+      te.uniq{|te| te.project }.each do |te_project|
+        @defaultContracts << Struct::DefaultContract.new(te_project.project, te.select { |te| te.project == te_project.project }.sum { |entry| entry.hours })
+      end
+    end
+
     render "index"
   end
 
@@ -80,20 +122,15 @@ class ContractsController < ApplicationController
 
   def create
     @contract = Contract.new(contract_params)
-    rates = params[:rates]
 
-    # Ensure only positive-value rates are entered
-    if !rates.nil?
-      rates.each_pair do |user_id, rate|
-        if rate.to_f < 0
-          flash[:error] = l(:text_invalid_rate)
-          redirect_to :action => "new", :id => @contract.id
-          return
-        end
-      end
+    if !rates_are_valid(params[:rates])
+      flash[:error] = l(:text_invalid_rate)
+      load_contractors_and_rates
+      render :new
+      return
     end
 
-    @contract.rates = rates
+    @contract.rates = params[:rates]
     @contract.project_contract_id = @project.contracts.empty? ? 1 : @project.contracts.last.project_contract_id + 1
 
     if @contract.save
@@ -108,13 +145,18 @@ class ContractsController < ApplicationController
 
   def show
     @contract = Contract.find(params[:id])
-    @time_entries = @contract.time_entries.order("spent_on DESC")
+    @time_entries = @contract.smart_time_entries.order("spent_on DESC, id DESC")
     @members = []
     @time_entries.each { |entry| @members.append(entry.user) unless @members.include?(entry.user) }
     @expenses_tab = (params[:contracts_expenses] == 'true')
+    @invoices_tab = (params[:contracts_invoices] == 'true')
     @summary_tab = (params[:contract_summary] == 'true')
     if @expenses_tab
       @expenses = @contract.contracts_expenses
+    end
+    if @invoices_tab
+      @invoices = @contract.contracts_invoices
+      @invoices = @contract.contracts_invoices
     end
     if @summary_tab
       @issues = []
@@ -122,6 +164,9 @@ class ContractsController < ApplicationController
       @issues.sort! { |a,b| @contract.amount_spent_on_issue(b) <=> @contract.amount_spent_on_issue(a)}
     end
 
+    @entry_count = @time_entries.count
+    @entry_pages = Paginator.new @entry_count, per_page_option, params['page']
+    @time_entries_page = @time_entries[@entry_pages.offset, @entry_pages.per_page]
   end
 
   def edit
@@ -132,23 +177,18 @@ class ContractsController < ApplicationController
 
   def update
     @contract = Contract.find(params[:id])
+
+    if !rates_are_valid(params[:rates])
+      flash[:error] = l(:text_invalid_rate)
+      redirect_to :action => "edit", :id => @contract.id
+      return
+    end
+
     if @contract.update_attributes(contract_params)
-      @rate_error = false
-      rates = params[:rates]
       @contract.rates = params[:rates]
-      rates.each_pair do |user_id, rate|
-        if rate.to_f <= 0
-          rate_error = true
-        end
-      end
-      if @rate_error
-        flash[:error] = l(:text_invalid_rate)
-        redirect_to :action => "edit", :id => @contract.id
-      else
-        @contract.save
-        flash[:notice] = l(:text_contract_updated)
-        redirect_to :action => "show", :id => @contract.id 
-      end
+      @contract.save
+      flash[:notice] = l(:text_contract_updated)
+      redirect_to :action => "show", :id => @contract.id
     else
       flash[:error] = "* " + @contract.errors.full_messages.join("</br>* ")
       redirect_to :action => "edit", :id => @contract.id
@@ -172,38 +212,78 @@ class ContractsController < ApplicationController
   def add_time_entries
     @contract = Contract.find(params[:id])
     @project = @contract.project
-    @time_entries = @contract.project.time_entries_for_all_descendant_projects.sort_by! { |entry| entry.spent_on }
+    @time_entries = @contract.project.time_entries_for_all_descendant_projects.order("spent_on ASC")
   end
 
   def assoc_time_entries_with_contract
     @contract = Contract.find(params[:id])
-    @project = @contract.project
+    changeCount = 0
+    successCount = 0
     time_entries = params[:time_entries]
     if time_entries != nil
-      time_entries.each do |time_entry| 
-        updated_time_entry = TimeEntry.find(time_entry.first)
-        updated_time_entry.contract = @contract
-        updated_time_entry.save
+      time_entries.each do |time_entry|
+        updated_time_entry = TimeEntry.find(time_entry)
+        changeCount += 1
+        # We can change if the time entry has either no contract or its contract is not locked
+        # and the contract we want to associate to is not locked neither.
+        if ((updated_time_entry.contract.nil? || !updated_time_entry.contract.is_locked) && !@contract.is_locked)
+          updated_time_entry.contract = @contract
+          updated_time_entry.save
+          successCount += 1
+        end
       end
     end
-    unless @contract.hours_remaining >= 0
+    # Can also unassociate
+    time_entries = params[:unassoc_time_entries]
+    if time_entries != nil
+      time_entries.each do |time_entry|
+        updated_time_entry = TimeEntry.find(time_entry)
+        changeCount += 1
+        # We can change if the time entry has either no contract or its contract is not locked
+        if (updated_time_entry.contract.nil? || !updated_time_entry.contract.is_locked)
+          updated_time_entry.contract = nil
+          updated_time_entry.save
+          successCount += 1
+        end
+      end
+    end
+
+    if successCount != changeCount
+      flash[:warning] = l(:text_some_contracts_are_locked)
+    end
+
+    unless @contract.nil? || @contract.hours_remaining >= 0
       flash[:error] = l(:text_hours_over_contract, :hours_over => l_hours(-1 * @contract.hours_remaining))
     end
-    redirect_to "/projects/#{@contract.project.id}/contracts/#{@contract.id}" 
+
+    redirect_back_or_default url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })
   end
 
   def lock
     @contract = Contract.find(params[:id])
     @lock = (params[:lock] == 'true')
     if @lock
+      # Associate all time entries to the contract because a locked
+      # contract will not receive 'smart' time entries anymore and those
+      # that were 'smartly' associated must stay.
+      if Setting.plugin_contracts['enable_smart_time_entries']
+        @contract.smart_time_entries.each do |time_entry|
+          time_entry.update_attribute(:contract, @contract)
+        end
+      end
       @contract.update_attribute(:is_locked, @lock)
       flash[:notice] = l(:text_contract_locked)
     else
+      teCountBefore = @contract.smart_time_entries.count
       @contract.is_locked = false
       @contract.hours_worked = nil
       @contract.billable_amount_total = nil
       @contract.save!
+      teCountAfter = @contract.smart_time_entries.count
       flash[:notice] = l(:text_contract_unlocked)
+      if (teCountAfter != teCountBefore)
+        flash[:warning] = l(:text_some_time_entries_were_added, :contract => view_context.link_to(@contract.title, url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })))
+      end
     end
 
     if params[:view] == 'index'
@@ -215,6 +295,16 @@ class ContractsController < ApplicationController
 
   private
 
+  def rates_are_valid(rates)
+    return true if rates.nil?
+    rates.each_pair do |user_id, rate|
+      if !is_number?(rate) or rate.to_f < 0
+        return false
+      end
+    end
+    return true
+  end
+
   def load_contractors_and_rates
     @contractors = Contract.users_for_project_and_sub_projects(@project)
     @contractor_rates = {}
@@ -225,6 +315,11 @@ class ContractsController < ApplicationController
         rate = @contract.user_contract_rate_or_default(contractor)
       end
       @contractor_rates[contractor.id] = rate
+    end
+    unless params[:rates].nil?
+      params[:rates].each do |contractor, rate|
+        @contractor_rates[contractor.to_i] = rate.to_f
+      end
     end
   end
 
@@ -251,6 +346,11 @@ class ContractsController < ApplicationController
       # set session variable for first time guests
       session[:show_locked_contracts] = false
     end
+  end
+
+  # Helper method for determining if a string is numeric.
+  def is_number? string
+    true if Float(string) rescue false
   end
 
 end

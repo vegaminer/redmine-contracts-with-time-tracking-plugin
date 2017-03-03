@@ -12,7 +12,7 @@ module Contracts
         after_destroy :refresh_contract
         after_create :refresh_contract
 
-        attr_accessor :flash_time_entry_success, :flash_only_one_time_entry
+        attr_accessor :flash_time_entry_success, :flash_only_one_time_entry, :flash_time_entry_to_smart_contract_success
 
         validate :time_not_exceed_contract
         before_save :create_next_contract
@@ -25,8 +25,11 @@ module Contracts
         # new contract.
         protected
         def time_not_exceed_contract
+          if Setting.plugin_contracts['enable_smart_time_entries']
+            return
+          end
           return if hours.blank?
-          return if contract.is_fixed_price
+          return if contract.nil? || contract.is_fixed_price
           previous_hours = (hours_was != nil) ? hours_was : 0 
 
           if contract_id != nil
@@ -47,7 +50,12 @@ module Contracts
         # is enabled and the hours exceed the current contract.
         private
         def create_next_contract
-          return if contract.is_fixed_price
+          if Setting.plugin_contracts['enable_smart_time_entries']
+            self.flash_time_entry_to_smart_contract_success = true;
+            return
+          end
+
+          return if contract.nil? || contract.is_fixed_price
           previous_hours = (hours_was != nil) ? hours_was : 0
           if Setting.plugin_contracts['automatic_contract_creation'] && hours > (contract.hours_remaining + previous_hours)
             new_contract = Contract.new

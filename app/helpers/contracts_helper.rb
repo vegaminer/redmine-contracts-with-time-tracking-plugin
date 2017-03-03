@@ -4,6 +4,10 @@ module ContractsHelper
     { :controller => 'contracts_expenses', :action => 'edit', :project_id => contract.project.identifier, :id => expense.id }
   end
 
+  def invoice_edit_urlpath(contract, invoice)
+    { :controller => 'contracts_invoices', :action => 'edit', :project_id => contract.project.identifier, :id => invoice.id }
+  end
+
   def format_hours(hours)
     format("%#.2f", hours)
   end

@@ -1,0 +1,36 @@
+<% if User.current.allowed_to?(:edit_contracts, @project) %>
+  <% menuEntries = [] %>
+  <%#Entries with a contract not locked %>
+  <% te_unassignable = time_entries.select { |te| !te.contract.nil? && !te.contract.is_locked } %>
+  <%#Entries with no contract or a contract not locked %>
+  <% te_assignable   = time_entries.select { |te| te.contract.nil? || (!te.contract.nil? && !te.contract.is_locked) } %>
+  <% unique_contract_assigned = (te_unassignable.uniq{|te| te.contract.id}.count == 1) ? te_unassignable[0].contract : nil %>
+  <% # If some time entries can be associated to a contract, offer to associate %>
+  <% if !te_assignable.empty? %>
+    <% # Add menus to associate to other contract(s) %>
+    <% @project.contracts.where(:is_locked => false).order("id ASC").each do |contract| %>
+      <%#Add contract to list if not locked and if different that at least one already assigned %>
+      <% if !te_assignable.select{ |te| te.contract != contract}.empty? %>
+        <% menuEntries << '<li>' + (context_menu_link l(:button_assign_contract, :contract => contract.title), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => contract, :project_id => @project, :time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link', :method => "put") + '</li>' %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% # If some time entries have an associated unlocked contract, offer to unassociate %>
+  <% if !te_unassignable.empty? %>
+    <% if unique_contract_assigned.nil? %>
+      <% # Assigned to different contracts.  Write generic "Unassociate from contracts" %>
+      <% menuEntries << '<li>' + (context_menu_link l(:button_unassign_multiple), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => te_unassignable[0].contract_id, :project_id => @project, :unassoc_time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link-break', :method => "put") + '</li>' %>
+    <% else %>
+      <% # All assigned to the same.  Write its name. %>
+      <% menuEntries << '<li>' + (context_menu_link l(:button_unassign_contract, :contract => unique_contract_assigned.title), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => unique_contract_assigned.id, :project_id => @project, :unassoc_time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link-break', :method => "put") + '</li>' %>
+    <% end %>
+  <% end %>
+  <li class="folder">
+    <a href="#" class="submenu <%= "disabled" if menuEntries.empty? %>"><%= l(:label_contract) %></a>
+    <% unless menuEntries.empty? %>
+      <ul>
+        <%= menuEntries.join.html_safe %>
+      </ul>
+    <% end %>
+  </li>
+<% end  %>

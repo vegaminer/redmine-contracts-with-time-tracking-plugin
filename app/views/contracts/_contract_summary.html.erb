@@ -6,8 +6,6 @@
       <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
         <th><%= l(:label_cost) %></th>
       <% end %>
-      <th></th>
-      <th></th>
     </tr>
   </thead>
   <% @issues.each do |issue| %>
