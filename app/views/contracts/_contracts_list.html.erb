@@ -12,14 +12,18 @@
       <th><%= l(:label_agreed_on) %></th>
       <th><%= l(:label_date_period) %></th>
       <th><%= l(:label_purchased) %></th>
+      <th>
       <% if (@project == nil) || (User.current.allowed_to?(:view_hourly_rate, @project)) %>
-        <th><%= l(:field_hourly_rate) %></th>
+        <%= l(:field_hourly_rate) %>
       <% end %>
+      </th>
       <th><%= l(:label_expenses) %></th>
       <th><%= l(:label_remaining) %></th>
+      <th>
       <% if (@project == nil) || (User.current.allowed_to?(:view_hourly_rate, @project)) %>
-        <th><%= l(:label_billable) %></th>
+        <%= l(:label_billable) %>
       <% end %>
+      </th>
       <th><%= l(:label_hours_worked) %></th>
       <th><%= l(:label_hours_left) %></th>
       <th><%= l(:label_contract) %></th>
@@ -108,15 +112,11 @@
         </td>
         <td></td>
         <td></td>
-        <% if (@project != nil) && (User.current.allowed_to?(:view_hourly_rate, @project)) %>
-          <td></td>
-        <% end %>
         <td></td>
         <td></td>
         <td></td>
-        <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
         <td></td>
-        <% end %>
+        <td></td>
         <td class="hours"><%= number_with_precision(contract.hours, :precision => 2) %></td>
         <td></td>
         <td></td>
