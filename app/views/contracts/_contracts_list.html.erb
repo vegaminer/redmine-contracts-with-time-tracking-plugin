@@ -18,7 +18,7 @@
       <th><%= l(:label_expenses) %></th>
       <th><%= l(:label_remaining) %></th>
       <% if (@project == nil) || (User.current.allowed_to?(:view_hourly_rate, @project)) %>
-          <th><%= l(:label_billable) %></th>
+        <th><%= l(:label_billable) %></th>
       <% end %>
       <th><%= l(:label_hours_worked) %></th>
       <th><%= l(:label_hours_left) %></th>
@@ -33,7 +33,7 @@
   <% @contracts.each do |contract| %>
     <% if !contract.is_locked || session[:show_locked_contracts] %>
       <tr class="<%= cycle("odd", "even") %>">
-        <td>
+        <td class="name">
           <%= link_to contract.title, { :controller => 'contracts', :action => 'show', :project_id => contract.project.identifier, :id => contract.id } %>
         </td>
         <td>
@@ -53,7 +53,7 @@
           <% end %>
         </td>
         <td class="amount"><%= number_to_currency(contract.purchase_amount) %></td>
-        <td>
+        <td class="hours">
         <% if User.current.allowed_to?(:view_hourly_rate, contract.project) %>
           <%= number_to_currency(contract.hourly_rate) %>
         <% end %>
@@ -114,7 +114,9 @@
         <td></td>
         <td></td>
         <td></td>
+        <% if User.current.allowed_to?(:view_hourly_rate, @project) %>
         <td></td>
+        <% end %>
         <td class="hours"><%= number_with_precision(contract.hours, :precision => 2) %></td>
         <td></td>
         <td></td>
