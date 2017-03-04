@@ -36,7 +36,7 @@ class ContractsController < ApplicationController
     @defaultContracts = []
 
     # all time entries
-    te = TimeEntry.where(:project_id => @project)
+    te = TimeEntry.where(:project_id => @project).to_a
     Contract.where(:project_id => @project).each do |contract|
       te -= contract.smart_time_entries
     end
@@ -100,7 +100,7 @@ class ContractsController < ApplicationController
     @defaultContracts = []
 
     # all time entries
-    te = TimeEntry.visible
+    te = TimeEntry.visible.to_a
     Contract.all.each do |contract|
       te -= contract.smart_time_entries
     end
@@ -291,6 +291,10 @@ class ContractsController < ApplicationController
     else
       redirect_to url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })
     end
+  end
+
+  def context_menu
+    render :layout => false
   end
 
   private
