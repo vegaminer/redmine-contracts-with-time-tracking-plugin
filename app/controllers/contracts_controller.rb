@@ -28,10 +28,12 @@ class ContractsController < ApplicationController
     # Calculate metrics for display.
     @total_purchased_dollars = @project.total_amount_purchased
     @total_purchased_fixed = fixed_contracts.map(&:purchase_amount).inject(0, &:+)
-    @total_amount_billable_fixed = fixed_contracts.map(&:smart_billable_amount_total).inject(0, &:+)
+    @total_amount_billable_fixed = fixed_contracts.map(&:smart_billable_amount_total).inject(0, &:+) -
+        fixed_contracts.map(&:invoices_amount).inject(0, &:+)
     @total_purchased_hourly = hourly_contracts.map(&:purchase_amount).inject(0, &:+)
     @total_purchased_hourly_hours = hourly_contracts.map(&:hours_purchased).inject(0, &:+)
-    @total_amount_billable_hourly = hourly_contracts.map(&:smart_billable_amount_total).inject(0, &:+)
+    @total_amount_billable_hourly = hourly_contracts.map(&:smart_billable_amount_total).inject(0, &:+) -
+        hourly_contracts.map(&:invoices_amount).inject(0, &:+)
     @total_amount_remaining_hourly = hourly_contracts.map(&:amount_remaining).inject(0, &:+)
     @total_remaining_hours = hourly_contracts.map(&:hours_remaining).inject(0, &:+)
 
@@ -92,10 +94,12 @@ class ContractsController < ApplicationController
 
     @total_purchased_dollars = all_contracts.sum { |contract| contract.purchase_amount }
     @total_purchased_fixed = fixed_contracts.sum { |contract| contract.purchase_amount }
-    @total_amount_billable_fixed = fixed_contracts.sum { |contract| contract.smart_billable_amount_total }
+    @total_amount_billable_fixed = fixed_contracts.sum { |contract| contract.smart_billable_amount_total } -
+        fixed_contracts.sum { |contract| contract.invoices_amount }
     @total_purchased_hourly = hourly_contracts.sum { |contract| contract.purchase_amount }
     @total_purchased_hourly_hours = hourly_contracts.sum { |contract| contract.hours_purchased }
-    @total_amount_billable_hourly = hourly_contracts.sum { |contract| contract.smart_billable_amount_total }
+    @total_amount_billable_hourly = hourly_contracts.sum { |contract| contract.smart_billable_amount_total } -
+        hourly_contracts.sum { |contract| contract.invoices_amount }
     @total_amount_remaining_hourly = hourly_contracts.sum { |contract| contract.amount_remaining }
     @total_remaining_hours = hourly_contracts.sum { |contract| contract.hours_remaining }
 

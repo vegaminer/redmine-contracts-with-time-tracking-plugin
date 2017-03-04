@@ -62,7 +62,7 @@
         <td class="amount green"><%= number_to_currency(contract.amount_remaining) %></td>
         <td class="amount green">
         <% if User.current.allowed_to?(:view_hourly_rate, contract.project) %>
-          <%= number_to_currency(contract.smart_billable_amount_total) %>
+          <%= number_to_currency(contract.smart_billable_amount_total - contract.invoices_amount) %>
         <% end %>
         </td>
         <td class="hours"><%= number_with_precision contract.smart_hours_spent, :precision => 2 %></td>
