@@ -1,14 +1,12 @@
 class ContractsController < ApplicationController
   before_filter :find_project, :authorize, :only => [:index, :show, :new, :create, :edit, :update, :destroy, 
-                                                     :add_time_entries, :assoc_time_entries_with_contract]
+                                                     :add_time_entries, :assoc_time_entries_with_contract, :series]
 
   Struct.new("DefaultContract", :project, :hours)
 
   def index
-    @project = Project.find(params[:project_id])
-
-    fixed_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => '1')
-    hourly_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => '0')
+    fixed_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => true)
+    hourly_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => false)
 
     # Show the tabs only if there are hourly and fixed contracts within the same project.
     if fixed_contracts.size > 0 && hourly_contracts.size > 0
@@ -92,16 +90,16 @@ class ContractsController < ApplicationController
       @contracts = hourly_contracts
     end
 
-    @total_purchased_dollars = all_contracts.sum { |contract| contract.purchase_amount }
-    @total_purchased_fixed = fixed_contracts.sum { |contract| contract.purchase_amount }
+    @total_purchased_dollars = all_contracts.map(&:purchase_amount).inject(0, &:+)
+    @total_purchased_fixed = fixed_contracts.map(&:purchase_amount).inject(0, &:+)
+    @total_purchased_hourly = hourly_contracts.map(&:purchase_amount).inject(0, &:+)
+    @total_purchased_hourly_hours = hourly_contracts.map(&:hours_purchased).inject(0, &:+)
+    @total_amount_remaining_hourly = hourly_contracts.map(&:amount_remaining).inject(0, &:+)
+    @total_remaining_hours = hourly_contracts.map(&:hours_remaining).inject(0, &:+)
     @total_amount_billable_fixed = fixed_contracts.sum { |contract| contract.smart_billable_amount_total } -
         fixed_contracts.sum { |contract| contract.invoices_amount }
-    @total_purchased_hourly = hourly_contracts.sum { |contract| contract.purchase_amount }
-    @total_purchased_hourly_hours = hourly_contracts.sum { |contract| contract.hours_purchased }
     @total_amount_billable_hourly = hourly_contracts.sum { |contract| contract.smart_billable_amount_total } -
         hourly_contracts.sum { |contract| contract.invoices_amount }
-    @total_amount_remaining_hourly = hourly_contracts.sum { |contract| contract.amount_remaining }
-    @total_remaining_hours = hourly_contracts.sum { |contract| contract.hours_remaining }
 
     set_contract_visibility
 
@@ -129,6 +127,10 @@ class ContractsController < ApplicationController
   end
 
   def create
+    if contract_params[:contract_type] != 'recurring'
+      params[:contract][:recurring_frequency] = :not_recurring
+    end
+
     @contract = Contract.new(contract_params)
 
     if !rates_are_valid(params[:rates])
@@ -138,10 +140,25 @@ class ContractsController < ApplicationController
       return
     end
 
+    if contract_params[:contract_type] != 'recurring'
+      params[:contract][:recurring_frequency] = :not_recurring
+    end
+
     @contract.rates = params[:rates]
     @contract.project_contract_id = @project.contracts.empty? ? 1 : @project.contracts.last.project_contract_id + 1
 
+    # Set the series ID to the project_contract_id if its a new recurring contract.
+    @contract.series_id = @contract.project_contract_id if contract_params[:contract_type] == 'recurring'
+
     if @contract.save
+      if contract_params[:contract_type] == 'recurring'
+        if @contract.monthly?
+          @contract.update_attribute(:end_date, @contract.start_date + 1.month)
+        elsif @contract.yearly?
+          @contract.update_attribute(:end_date, @contract.start_date + 1.year)
+        end
+      end
+
       flash[:notice] = l(:text_contract_saved)
       redirect_to :action => "show", :id => @contract.id
     else
@@ -192,9 +209,47 @@ class ContractsController < ApplicationController
       return
     end
 
+    # Set the end date to null so that the start_date end_date validation passes
+    # if the start date is changed to after the end date.
+    if @contract.contract_type == 'recurring'
+      params[:contract][:end_date] = nil
+      @contract.end_date = nil
+    end
+
     if @contract.update_attributes(contract_params)
-      @contract.rates = params[:rates]
-      @contract.save
+      @contract.update_attribute(:rates, params[:rates])
+      if @contract.contract_type == 'recurring'
+        if @contract.monthly?
+          @contract.update_attribute(:end_date, @contract.start_date + 1.month)
+        elsif @contract.yearly?
+          @contract.update_attribute(:end_date, @contract.start_date + 1.year)
+        end
+      end
+      flash[:notice] = l(:text_contract_updated)
+      redirect_to :action => "show", :id => @contract.id
+    else
+      flash[:error] = "* " + @contract.errors.full_messages.join("</br>* ")
+      redirect_to :action => "edit", :id => @contract.id
+    end
+  end
+
+  def series
+    @contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :series_id => params[:id])
+    @show_fixed_contracts = true
+
+    # Calculate metrics for display.
+    @total_purchased_fixed = @contracts.map(&:purchase_amount).inject(0, &:+)
+
+    set_contract_visibility
+
+    render "index"
+  end
+
+  def cancel_recurring
+    @contract = Contract.find(params[:id])
+    @contract.completed!
+
+    if @contract.save
       flash[:notice] = l(:text_contract_updated)
       redirect_to :action => "show", :id => @contract.id
     else
@@ -301,9 +356,10 @@ class ContractsController < ApplicationController
     end
   end
 
-  def context_menu
-    render :layout => false
+  def tooltips
+    @id = params[:id]
   end
+
 
   private
 
@@ -342,7 +398,8 @@ class ContractsController < ApplicationController
 
   def contract_params
     params.require(:contract).permit(:description, :agreement_date, :start_date, :end_date, :contract_url,
-      :invoice_url, :project_id, :purchase_amount, :hourly_rate, :category_id, :is_fixed_price, :title)
+      :invoice_url, :project_id, :purchase_amount, :hourly_rate, :category_id, :is_fixed_price, :title,
+      :contract_type, :recurring_frequency)
   end
 
   # Allows the user to hide or show locked contracts on contract list pages
@@ -354,9 +411,15 @@ class ContractsController < ApplicationController
       else
         session[:show_locked_contracts] = false
       end
+      if params[:contract_list][:show_only_active_recurring] == "true"
+        session[:show_only_active_recurring] = true
+      else
+        session[:show_only_active_recurring] = false
+      end
     elsif session[:show_locked_contracts].nil?
       # set session variable for first time guests
       session[:show_locked_contracts] = false
+      session[:show_only_active_recurring] = false
     end
   end
 

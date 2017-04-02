@@ -1,6 +1,15 @@
 # Simplified Chinese strings go here for Rails i18n
 zh:
-  project_module_contracts: 合同管理
+  contract_types:
+    hourly: "工时计价"
+    fixed: "固定总价"
+    recurring: "续生"
+  recurring_frequencies:
+    monthly: "按月"
+    yearly: "按年"
+    completed: "已完成"
+    not_recurring: "非续生"
+  project_module_contracts: 合同
   permission_view_all_contracts_for_project: 查看项目的所有合同
   permission_view_contract_details: 查看合同明细
   permission_edit_contracts: 编辑合同
@@ -16,8 +25,9 @@ zh:
   permission_delete_invoices: 删除票据
   permission_view_invoices: 查看票据
 
-  contracts: 合同
+  contracts: 合同管理
   label_contracts: 合同
+  label_series_title: "#%{series_id} 系列的续生合同"
   label_contract: 合同
   label_contractors_rates: 承包商费用
   label_new_contract: 添加合同
@@ -39,9 +49,9 @@ zh:
   label_contractor_rate: 承包商费率
   label_billable_amount: 计费金额
   label_time_entries: 登记工时
-  label_hourly_priced_contracts: 计时合同
-  label_effective_rate: 实际费率
-  label_fixed_priced_contracts: 固定造价合同
+  label_hourly_priced_contracts: 工时计价合同
+  label_effective_rate: 有效费率
+  label_fixed_priced_contracts: 固定总价合同
   label_add_to_contract: 添加到合同
   label_date: 日期
   label_current_contract: 当前合同
@@ -82,9 +92,16 @@ zh:
   label_lock: 锁定合同
   label_unlock: 解锁合同
   label_show_locked_contracts: 显示已锁定的合同
-
+  label_show_only_active_recurring: "仅显示 \"活动中\" 的续生合同"
+  label_recurring: 续生周期
+  label_cancel_recurring: 结束续生
+  label_view_series: 查看系列
+  label_tooltips: Redmine Contract - 帮助说明
+  label_contract_types: 合同类型
+  
   text_contract_list: 合同列表
   text_are_you_sure_delete_title: "确认删除 %{value}？"
+  text_are_you_sure_stop_recurring: "确认结束该续生合同？"  
   text_are_you_sure_delete_time_entry: "确认删除该工时记录？"
   text_are_you_sure_delete_expense: "确认删除费用记录？"
   text_are_you_sure_delete_invoice: "确认删除票据记录？"  
@@ -95,14 +112,14 @@ zh:
   text_contract_updated: 合同已更新。
   text_contract_deleted: 合同已删除。
   text_hours_over_contract: "目前已超合同上限 %{hours_over} 工时。"
-  text_split_time_entry_saved: 由于工时登记的数量已超过了当前合同的剩余时间，您的工时记录已自动拆分为两条。拆分的第二条工时记录已添加到新的待定合同中。
+  text_split_time_entry_saved: 由于工时记录的数量已超过了当前合同的剩余时间，您的工时记录已自动拆分为两条。拆分的第二条工时记录已添加到新的待定合同中。
   text_one_time_entry_saved: 由于您选择的合同工时余额已耗尽，故创建一个新合同，并将工时记录保存至该合同。
   text_time_entry_added_to_contract: "工时记录在以下合同中显示：%{contract} 。"
   text_time_entry_not_added_to_contract: "工时记录在合同中不显示。"
   text_hours_too_large: 无效。金额已超剩余时间加上新合同的大小。
   text_invalid_rate: "承包商费率必须大于等于零。"
   text_invalid_issue_id: "不是有效的问题ID"
-  text_invalid_hours: "无效。合同 %{title} 仅剩 %{hours} 小时。 请与管理联系确认开启合同自动创建配置。"
+  text_invalid_hours: "无效。合同 %{title} 仅剩 %{hours} 小时。 请与管理联系确认开启自动创建工时计价合同的配置。"
   text_second_time_entry_failure: "系统故障。无法保存第2条工时记录。错误信息：%{error}"
   text_auto_contract_failure: "系统故障。无法保存该合同的拆分工时记录。错误信息：%{error}"
   text_expense_created: '费用记录已添加。'
@@ -114,7 +131,7 @@ zh:
   text_na: 'N/A'
   text_contract_locked: 合同已锁定。
   text_contract_unlocked: 合同已解锁。
-  text_locked_contract_cache_updated: 此条目与锁定合同关联。合同的缓存值已更新以反映您的更改。
+  text_locked_contract_cache_updated: 工时等级条目与锁定合同关联。合同的缓存值已更新以反映您的更改。
   text_expenses_uneditable: 该合同的费用不可编辑（合同已锁定）。
   text_invoices_uneditable: 当前合同的票据信息不能修改（合同已锁定）。
   text_contract_is_locked: 无法执行此操作（合同已锁定）。
@@ -126,7 +143,11 @@ zh:
   text_previous_id: "为该项目创建的最近一个合同使用的合同ID为 %{previous_id}"
   text_contract_category_helper: "[可选] 如果没有提供合同类别，默认将使用此类别。合同类别使用枚举值。"
   text_contract_title_helper: "[可选] 用于覆盖默认标题。"
+  text_hourly_rate_helper: "有助于确定支付给承包商多少钱。与每工时有效费率无关。"
   text_hour: / hr
+  text_fixed_contract_help: 在人工单价已确认的情况下，固定总价合同是最理想的选择。固定总价合同显示在合同列表页面的固定总价合同标签下。在固定总价合同中，工时记录将影响每工时的有效费率，且工时费用不会从采购金额中扣除。 每工时费率只是帮助您确定对项目工作的潜在承包商支付什么费用。
+  text_recurring_contract_help: 续生合同是订阅的理想选择。续生合同显示在合同列表页面的固定总价合同标签下。续生合同以“续生”列标识。除了在续生周期内会自动创建新合同外，续生合同和固定总价合同无二。
+  text_hourly_contract_help: 在按工时计费的情况下，工时计价合同是比较理想的选择。工时计价合同显示在合同列表页面上的工时计价合同标签下。工时计价合同中，工时记录的费用（承包商每小时的费率）将从采购金额中直接扣除。在合同插件的选项中，可以配置登记工时记录总量超过当前合同采购金额时，自动创建新的工时计价合同。
 
   field_contract: 合同
   field_project_contract: 合同编号
@@ -138,14 +159,16 @@ zh:
   field_hourly_rate: 费用/工时
   field_contract_url: 合同 URL
   field_invoice_url: 票据 URL
-  field_is_fixed_price: 固定造价
+  field_is_fixed_price: 固定总价
+  field_contract_type: 合同类型
+  field_recurring_frequency: 续生频率
 
-  field_expense_name: 名称
+  field_expense_name: 费用名称
   field_expense_date: 费用发生日期
   field_invoice_date: 开票日期
   field_invoice_number: 数量
   field_amount: 数额
-  field_expense_contract: 合同
+  field_expense_contract: 关联合同
   field_invoice_contract: 合同
   field_issue: 问题 (ID)
   field_unbilled: 未开票
