@@ -9,8 +9,14 @@
         </td>
       <% end %>
       <td>
-        <h3><%= l(:label_total_fixed) %></h3>
+        <h3>
+          <%= controller.action_name == "series" ? l(:label_total_series) : l(:label_total_fixed) %>
+        </h3>
         <p class="bigbold"><%= number_to_currency(@total_purchased_fixed) %></p>
+      </td>
+      <td>
+        <h3><%= l(:label_total_billable_fixed) %></h3>
+        <p class="green bigbold"><%= number_to_currency(@total_amount_billable_fixed) %></p>
       </td>
     </tr>
   <% end %>
@@ -27,6 +33,10 @@
         <p class="green bigbold"><%= number_to_currency(@total_amount_remaining_hourly) %></p>
         <p><%= l(:label_or) %></p>
         <p class="blue bigbold">~<%= l_hours @total_remaining_hours %></p>
+      </td>
+      <td>
+        <h3><%= l(:label_total_billable_hourly) %></h3>
+        <p class="green bigbold"><%= number_to_currency(@total_amount_billable_hourly) %></p>
       </td>
     </tr>
   <% end %>
