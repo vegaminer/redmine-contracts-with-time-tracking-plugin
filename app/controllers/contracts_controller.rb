@@ -81,6 +81,11 @@ class ContractsController < ApplicationController
       @show_tabs = true
     end
 
+    if params[:invoices_tab_active]
+      @show_invoices = true
+      @invoices = ContractsInvoice.order(:invoice_date => "desc").all
+    end
+
     # Show fixed contracts if the fixed tab is selected or if there aren't any hourly contracts.
     @show_fixed_contracts = (fixed_contracts.size > 0 && hourly_contracts.size == 0) || params[:fixed_tab_active] == 'true'
 
@@ -180,7 +185,6 @@ class ContractsController < ApplicationController
       @expenses = @contract.contracts_expenses
     end
     if @invoices_tab
-      @invoices = @contract.contracts_invoices
       @invoices = @contract.contracts_invoices
     end
     if @summary_tab

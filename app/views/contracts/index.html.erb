@@ -4,42 +4,63 @@
   <% end %>
 </div>
 
-<h2>
-  <%= controller.action_name == "series" ? l(:label_series_title, :series_id => params[:id]) : l(:label_contracts) %>
-</h2>
-<% if @contracts.empty? %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
+<% if (@project != nil) %>
+  <h2>
+    <%= controller.action_name == "series" ? l(:label_series_title, :series_id => params[:id]) : l(:label_contracts) %>
+  </h2>
 <% else %>
-  <%= render 'contracts_summary' %>
-
-  <% if @show_tabs %>
-    <div class="tabs">
-      <ul>
+  <div class="tabs">
+    <ul>
+      <li>
+        <a href="<%= url_for({ :controller => 'contracts', :action => 'all' }) %>" <%= tab_selected unless @show_invoices %>><%= l(:label_contracts) %></a>
+      </li>
+      <% if User.current.allowed_to?(:view_invoices, nil, :global => true) %>
         <li>
-          <% if (@project != nil) %>
-            <a href="<%= url_for({ :controller => 'contracts', :action => 'index', :project_id => @project.identifier }) %>" <%= tab_selected unless @show_fixed_contracts %>><%= l(:label_hourly_priced_contracts) %></a>
-            <% else %>
-              <a href="<%= url_for({ :controller => 'contracts', :action => 'all' }) %>" <%= tab_selected unless @show_fixed_contracts %>><%= l(:label_hourly_priced_contracts) %></a>
-            <% end %>
+          <a href="<%= url_for({ :controller => 'contracts', :action => 'all', :invoices_tab_active => 'true' }) %>" <%= tab_selected if @show_invoices %>><%= l(:label_invoices) %></a>
         </li>
-        <li>
-          <% if @project != nil %>
-            <a href="<%= url_for({ :controller => 'contracts', :action => 'index', :project_id => @project.identifier, :fixed_tab_active => 'true' }) %>" <%= tab_selected if @show_fixed_contracts %>><%= l(:label_fixed_priced_contracts) %></a>
-          <% else %>
-            <a href="<%= url_for({ :controller => 'contracts', :action => 'all', :fixed_tab_active => 'true' }) %>" <%= tab_selected if @show_fixed_contracts %>><%= l(:label_fixed_priced_contracts) %></a>
-          <% end %>
-        </li>
-      </ul>
-    </div>
-  <% end %>
-
-  <% if @show_fixed_contracts %>
-    <%= render 'fixed_price_list' %>
-  <% else %>
-    <%= render 'contracts_list' %>
-  <% end %>
+      <% end %>
+    </ul>
+  </div>
 <% end %>
 
+<% if @show_invoices %>
+  <form>
+  <%= render 'invoices_list' %>
+  </form>
+<% else %>
+  <% if @contracts.empty? %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+    <%= render 'contracts_summary' %>
+
+    <% if @show_tabs %>
+      <div class="tabs">
+        <ul>
+          <li>
+            <% if (@project != nil) %>
+              <a href="<%= url_for({ :controller => 'contracts', :action => 'index', :project_id => @project.identifier }) %>" <%= tab_selected unless @show_fixed_contracts %>><%= l(:label_hourly_priced_contracts) %></a>
+              <% else %>
+                <a href="<%= url_for({ :controller => 'contracts', :action => 'all' }) %>" <%= tab_selected unless @show_fixed_contracts %>><%= l(:label_hourly_priced_contracts) %></a>
+              <% end %>
+          </li>
+          <li>
+            <% if @project != nil %>
+              <a href="<%= url_for({ :controller => 'contracts', :action => 'index', :project_id => @project.identifier, :fixed_tab_active => 'true' }) %>" <%= tab_selected if @show_fixed_contracts %>><%= l(:label_fixed_priced_contracts) %></a>
+            <% else %>
+              <a href="<%= url_for({ :controller => 'contracts', :action => 'all', :fixed_tab_active => 'true' }) %>" <%= tab_selected if @show_fixed_contracts %>><%= l(:label_fixed_priced_contracts) %></a>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if @show_fixed_contracts %>
+      <%= render 'fixed_price_list' %>
+    <% else %>
+      <%= render 'contracts_list' %>
+    <% end %>
+  <% end %>
+<% end %>
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'contracts', :plugin => 'contracts' %>
