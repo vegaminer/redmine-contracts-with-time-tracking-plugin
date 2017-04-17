@@ -31,7 +31,8 @@ class ContractsInvoicesController < ApplicationController
   def update
     respond_to do |format|
       if @contracts_invoice.update_attributes(invoice_params)
-        format.html { redirect_to contract_urlpath(@contracts_invoice), notice: l(:text_invoice_updated) }
+        flash[:notice] = l(:text_invoice_updated)
+        format.html { redirect_back_or_default contract_urlpath(@contracts_invoice), notice: l(:text_invoice_updated) }
       else
         load_contracts
         format.html { render action: 'edit' }
@@ -40,11 +41,10 @@ class ContractsInvoicesController < ApplicationController
   end
 
   def destroy
-    back_to = contract_urlpath(@contracts_invoice)
     @contracts_invoice.destroy
     flash[:notice] = l(:text_invoice_deleted)
     respond_to do |format|
-      format.html { redirect_to back_to }
+      format.html { redirect_back_or_default contract_urlpath(@contracts_invoice), notice: l(:text_invoice_deleted) }
     end
   end
 

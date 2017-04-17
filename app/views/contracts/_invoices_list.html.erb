@@ -30,7 +30,7 @@
           <% end %>
           <% if !invoice.contract.is_locked && User.current.allowed_to?(:delete_invoices, invoice.contract.project) %>
             <%= link_to image_tag("delete.png"), { :controller => 'contracts_invoices', :action => 'destroy',
-              :project_id => invoice.contract.project.identifier, :id => invoice.id },
+              :project_id => invoice.contract.project.identifier, :id => invoice.id, :back_url => url_for(params) },
               :title => l(:label_delete), :data => {:confirm => l(:text_are_you_sure_delete_invoice)}, :method => :delete %>
           <% end %>
         </td>

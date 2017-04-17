@@ -25,6 +25,7 @@
 
 <% if @show_invoices %>
   <form>
+  <%= hidden_field_tag 'back_url', url_for(params) %>
   <%= render 'invoices_list' %>
   </form>
 <% else %>
