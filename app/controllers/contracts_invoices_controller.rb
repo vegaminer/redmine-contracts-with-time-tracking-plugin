@@ -2,6 +2,8 @@ class ContractsInvoicesController < ApplicationController
   before_filter :set_project, :authorize, :only => [:new, :edit, :update, :create, :destroy]
   before_filter :set_invoice, :only => [:edit, :update, :destroy]
 
+  helper :context_menus
+
   def new
     @contracts_invoice = ContractsInvoice.new
     # If creating an invoice from a contract (the usual case), use the provided contract_id (if any)
@@ -46,6 +48,39 @@ class ContractsInvoicesController < ApplicationController
     end
   end
 
+  def context_menu
+    @back = back_url
+    @invoices = ContractsInvoice.where(:id => params[:id] || params[:ids])
+    @invoice = @invoices.first if (@invoices.size == 1)
+    @can = {:edit =>  @invoices.collect{|c| User.current.allowed_to?(:edit_invoices, c.contract.project)}.all?,
+            :delete => @invoices.collect{|c| User.current.allowed_to?(:delete_invoices, c.contract.project)}.all?
+    }
+    render :layout => false
+  end
+
+  def bulk_status
+    @invoices = ContractsInvoice.where(:id => params[:ids])
+    raise ActiveRecord::RecordNotFound if @invoices.empty?
+    unsaved_invoices_ids = []
+    @invoices.each do |invoice|
+      invoice.reload
+      invoice.status = params[:status]
+      unless invoice.save
+        unsaved_invoices_ids << invoice.id
+      end
+    end
+
+    if unsaved_invoices_ids.empty?
+      flash[:notice] = l(:notice_successful_update) unless @invoices.empty?
+    else
+      flash[:error] = l(:notice_failed_to_save_invoices,
+                        :count => unsaved_invoices_ids.size,
+                        :total => @invoices.size,
+                        :ids => '#' + unsaved_invoices_ids.join(', #'))
+    end
+    redirect_back_or_default url_for({ :controller => 'contracts', :action => 'show', :project_id => @invoices.first.contract.project.identifier, :id => @invoices.first.contract.id })
+  end
+
   private
 
     def contract_urlpath(invoice)
@@ -71,7 +106,7 @@ class ContractsInvoicesController < ApplicationController
     private
 
     def invoice_params
-      params.require(:contracts_invoice).permit(:invoice_date, :invoice_number, :amount, :contract_id)
+      params.require(:contracts_invoice).permit(:invoice_date, :invoice_number, :amount, :contract_id, :status)
     end
 
 end

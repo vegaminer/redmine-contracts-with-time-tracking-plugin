@@ -38,6 +38,9 @@ end
       <% @contracts = @project.contracts_for_all_ancestor_projects %>
       <%= select("contracts_invoice", "contract_id", @contracts.collect { |c| [ c.title, c.id ] }, {:include_blank => l(:label_select_contract)}) %>
     </p>
+    <p>
+      <%= f.select :status, ContractsInvoice::INVOICE_STATUS.map { |s| [I18n.t("invoice_status.#{s}"), s] }, {} %>
+    </p>
   </div>
   <%= f.submit l(:label_save_invoice) %>
 

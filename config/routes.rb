@@ -36,4 +36,5 @@ match 'projects/:project_id/contracts/invoices/create'                => 'contra
 match 'projects/:project_id/contracts/invoices/update/:id'            => 'contracts_invoices#update',   :via => :put
 match 'projects/:project_id/contracts/invoices/destroy/:id'           => 'contracts_invoices#destroy',   :via => :delete
 
-match 'projects/:project_id/contracts/invoices/context_menu', :to => 'contracts_invoices#context_menu', :as => :contracts_invoices_context_menu_path, :via => [:get, :post]
+match 'contracts/invoices/context_menu', :to => 'contracts_invoices#context_menu', :as => :contracts_invoices_context_menu_path, :via => [:get, :post]
+match 'contracts/invoices/bulk_status', :to => 'contracts_invoices#bulk_status', :as => :contracts_invoices_bulk_status_path, :via => [:get, :post]
