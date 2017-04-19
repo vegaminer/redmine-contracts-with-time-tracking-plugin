@@ -3,30 +3,39 @@
 <table class="invoices-for-contract-list list">
   <thead>
     <tr>
+      <th class="checkbox hide-when-print">
+        <%= check_box_tag 'check_all', '', false, :class => 'toggle-selection',
+                          :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}" %>
+      </th>
       <th><%= l(:label_date) %></th>
       <th><%= l(:label_number) %></th>
-      <th><%= l(:label_amount) %></th>
+      <th class="amount"><%= l(:label_amount) %></th>
+      <th><%= l(:field_status) %></th>
       <th><%= l(:label_contract) %></th>
       <th></th>
     </tr>
   </thead>
   <% @invoices.each do |invoice| %>
-    <tr class="invoice <%= cycle("odd", "even") %> hascontextmenu">
-      <td><%= format_date(invoice.invoice_date) %></td>
-      <td><%= link_to invoice.invoice_number, invoice_edit_urlpath(@contract, invoice) %></td>
-      <td><%= number_to_currency(invoice.amount) %></td>
-      <td><%= link_to invoice.contract.title, { :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id } %></td>
-      <td class="buttons">
-        <% if !@contract.is_locked && User.current.allowed_to?(:edit_invoices, @project) %>
-          <%= link_to image_tag("edit.png"), invoice_edit_urlpath(@contract, invoice), :title => l(:label_edit) %>
-        <% end %>
-        <% if !@contract.is_locked && User.current.allowed_to?(:delete_invoices, @project) %>
-          <%= link_to image_tag("delete.png"), { :controller => 'contracts_invoices', :action => 'destroy',
-            :project_id => @contract.project.identifier, :id => invoice.id },
-            :title => l(:label_delete), :data => {:confirm => l(:text_are_you_sure_delete_invoice)}, :method => :delete %>
-        <% end %>
-      </td>
-    </tr>
+    <% if User.current.allowed_to?(:view_invoices, invoice.contract.project) %>
+      <tr class="invoice <%= cycle("odd", "even") %> hascontextmenu">
+        <td class="checkbox hide-when-print"><%= check_box_tag("ids[]", invoice.id, false, :id => nil) %></td>
+        <td><%= format_date(invoice.invoice_date) %></td>
+        <td><%= link_to invoice.invoice_number, invoice_edit_urlpath(invoice.contract, invoice) %></td>
+        <td class="amount"><%= number_to_currency(invoice.amount) %></td>
+        <td><%= I18n.t("invoice_status.#{invoice.status}") %></td>
+        <td><%= link_to invoice.contract.title, { :controller => 'contracts', :action => 'show', :project_id => invoice.contract.project.identifier, :id => invoice.contract.id } %></td>
+        <td class="buttons">
+          <% if !invoice.contract.is_locked && User.current.allowed_to?(:edit_invoices, invoice.contract.project) %>
+            <%= link_to image_tag("edit.png"), invoice_edit_urlpath(invoice.contract, invoice), :title => l(:label_edit) %>
+          <% end %>
+          <% if !invoice.contract.is_locked && User.current.allowed_to?(:delete_invoices, invoice.contract.project) %>
+            <%= link_to image_tag("delete.png"), { :controller => 'contracts_invoices', :action => 'destroy',
+              :project_id => invoice.contract.project.identifier, :id => invoice.id, :back_url => url_for(params) },
+              :title => l(:label_delete), :data => {:confirm => l(:text_are_you_sure_delete_invoice)}, :method => :delete %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
 </table>
 </div>

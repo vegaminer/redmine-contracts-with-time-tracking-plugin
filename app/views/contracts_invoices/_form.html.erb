@@ -8,6 +8,7 @@ else
 end
 %>
 <%= labelled_form_for @contracts_invoice, :url => url, :method => method do |f| %>
+  <%= back_url_hidden_field_tag %>
   <% if @contracts_invoice.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@contracts_invoice.errors.count, "error") %> prohibited this invoice from being saved:</h2>
@@ -37,6 +38,9 @@ end
       <% end %>
       <% @contracts = @project.contracts_for_all_ancestor_projects %>
       <%= select("contracts_invoice", "contract_id", @contracts.collect { |c| [ c.title, c.id ] }, {:include_blank => l(:label_select_contract)}) %>
+    </p>
+    <p>
+      <%= f.select :status, ContractsInvoice::INVOICE_STATUS.map { |s| [I18n.t("invoice_status.#{s}"), s] }, {} %>
     </p>
   </div>
   <%= f.submit l(:label_save_invoice) %>

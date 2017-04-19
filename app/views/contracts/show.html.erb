@@ -166,7 +166,7 @@
 <div class="tabs">
   <ul>
     <li>
-      <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id }) %>" <%= tab_selected unless @expenses_tab or @summary_tab %>><%= l(:label_time_entries) %></a>
+      <a href="<%= url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id }) %>" <%= tab_selected unless @expenses_tab or @invoices_tab or @summary_tab %>><%= l(:label_time_entries) %></a>
     </li>
     <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
       <% if User.current.allowed_to?(:view_expenses, @project) %>

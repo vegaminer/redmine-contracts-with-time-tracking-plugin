@@ -107,7 +107,7 @@
 
   <% @defaultContracts.each do |contract| %>
       <tr class="<%= cycle("odd", "even") %>">
-        <td>
+        <td class="name">
           <%= link_to '[[ ' + contract.project.name + ' ]]', {:controller => 'contracts', :action => 'default', :project_id => contract.project.identifier } %>
         </td>
         <td></td>
