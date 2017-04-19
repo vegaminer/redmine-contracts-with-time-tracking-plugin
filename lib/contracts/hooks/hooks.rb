@@ -52,7 +52,7 @@ module Contracts
     # Poor Man's Cron
     def controller_account_success_authentication_after(context={})
       # check to see if cron has ran today or if its null
-      last_run = Setting.plugin_contracts[:last_cron_run]
+      last_run = Setting.plugin_contracts['last_cron_run']
       if last_run.nil? || last_run < Date.today
         # Get all monthly recurring contracts
         monthly_contracts = Contract.monthly
@@ -81,7 +81,7 @@ module Contracts
         end
       end
 
-      Setting.plugin_contracts.update({last_cron_run: Date.today})
+      Setting.plugin_contracts['last_cron_run'] = Date.today
     end
 
     def expire_contract(contract)
