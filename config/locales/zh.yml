@@ -48,6 +48,7 @@ zh:
   label_hours: 工时
   label_contractor_rate: 承包商费率
   label_billable_amount: 计费金额
+  label_billable: 入账
   label_time_entries: 登记工时
   label_hourly_priced_contracts: 工时计价合同
   label_effective_rate: 有效费率
@@ -70,9 +71,13 @@ zh:
   label_hours_left: "~剩余工时"
   label_total_purchased: 所有合同的总额
   label_total_remaining: 所有合同的剩余总额
+  label_total_billable: 全部合同总计入账  
   label_total_fixed: 固定造价合同的总额
+  label_total_series: 总计购买额度  
   label_total_hourly: 计时合同的总额
   label_remaining_hourly: 计时合同的剩余总额
+  label_total_billable_fixed: 固定总价合同总计入账
+  label_total_billable_hourly: 工时计价合同总计入账
   label_or: "- 相当于 -"
   label_create_contract: 添加合同
   label_update_contract: 更新合同
@@ -173,6 +178,12 @@ zh:
   field_issue: 问题 (ID)
   field_unbilled: 未开票
   field_invoiced: 已开票
+
+  invoice_status:
+    draft: "草拟"
+    sent: "已发送"
+    paid: "已清付"
+  notice_failed_to_save_invoices: "无法在所选的 %{total} 个数据中保存 %{count} 个票据信息：%{ids}。"
 
   button_assign: 关联到合同
   button_unassign: 解除合同关联
