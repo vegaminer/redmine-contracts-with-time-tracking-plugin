@@ -1,10 +1,10 @@
-.parent
+.responsiveparent
 {
   width:100%;
   white-space: nowrap;
 }
 
-.child
+.responsivechild
 {
   display:inline-block;
   /* Remove 4 px each to have room for 8px padding between the two columns */
@@ -12,18 +12,18 @@
   vertical-align: top;
   padding-right: 8px;
 }
-.child:last-child
+.responsivechild:last-child
 {
   padding-right: 0px;
 }
 
 @media screen and (max-width: 899px) {
-  .child
+  .responsivechild
   {
     width:100%;
     padding-right: 0px;
   }
-  .parent
+  .responsiveparent
   {
     white-space: normal;
   }

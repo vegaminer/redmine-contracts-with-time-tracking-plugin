@@ -26,8 +26,8 @@
   <% end %>
 </h2>
 
-<div class="parent">
-  <div class="child">
+<div class="responsiveparent">
+  <div class="responsivechild">
   <div class="autoscroll">
         <table class="contract-summary list">
           <thead>
@@ -106,7 +106,7 @@
     </table>
     </div>
   </div>
-  <div class="child">
+  <div class="responsivechild">
       <% if User.current.allowed_to?(:view_time_entries, @project) || not(@contract.is_fixed_price) %>
         <div class="autoscroll">
         <td class="hours-summary-td">

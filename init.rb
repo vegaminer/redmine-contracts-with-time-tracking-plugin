@@ -1,4 +1,3 @@
-require_dependency 'contracts/hooks/hooks'
 require_dependency 'contracts/patches/time_entry_patch'
 require_dependency 'contracts/patches/timelog_controller_patch'
 require_dependency 'contracts/patches/issues_controller_patch'
@@ -52,4 +51,5 @@ ActionDispatch::Callbacks.to_prepare do
   IssuesController.send(:include, Contracts::IssuesControllerPatch)
   User.send(:include, Contracts::UserPatch)
   require_dependency 'contract_category'
+  require_dependency 'contracts/hooks/hooks'
 end

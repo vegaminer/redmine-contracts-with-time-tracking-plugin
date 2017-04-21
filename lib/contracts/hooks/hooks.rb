@@ -51,6 +51,11 @@ module Contracts
 
     # Poor Man's Cron
     def controller_account_success_authentication_after(context={})
+      # for unknown reasons, some reported a problem here and it seems Setting.plugin_contracts
+      # was a String.  A string is the default value for a missing setting.  Until more is known
+      # simply replace by a fresh object here.
+      Setting.plugin_contracts = ActionController::Parameters.new unless Setting.plugin_contracts.is_a? ActionController::Parameters
+      
       # check to see if cron has ran today or if its null
       last_run = Setting.plugin_contracts[:last_cron_run]
       if last_run.nil? || last_run < Date.today

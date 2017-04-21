@@ -4,16 +4,16 @@
 ### Current changes in this fork:
 
 - The time log entries do not need to be associated to a contract.  They will go in the first contract that covers the time log date range, according to the following logic:
- - The time log goes into the oldest contract having start and end dates matching the time log date.  If many contracts in the project do overlap, the oldest one will prevail.
- - It is possible to manually assign time log entries to specific project, even if the date is before or after the contract.  You can do this by right-clicking any time log entry, either in the log time details page, or in any contract view showing the log time entries.
- - Time entries that are not associated manually and do not fall in the range of any contract are displayed in some default (virtual) contracts.
- - When a time log is created, a message will show into which contract, if any, this time log is currently visible.
+  - The time log goes into the oldest contract having start and end dates matching the time log date.  If many contracts in the project do overlap, the oldest one will prevail.
+  - It is possible to manually assign time log entries to specific project, even if the date is before or after the contract.  You can do this by right-clicking any time log entry, either in the log time details page, or in any contract view showing the log time entries.
+  - Time entries that are not associated manually and do not fall in the range of any contract are displayed in some default (virtual) contracts.
+  - When a time log is created, a message will show into which contract, if any, this time log is currently visible.
 - Invoices can be added to contracts (in a very similar way to expenses).
- - **NOTE: This creates a new table named 'contracts_invoices'**
+  - **NOTE: This creates a new table named 'contracts_invoices'**
 - Some UI improvements:
- - More responsive layout
- - Better alignment
- - Right-mouse click in time entries list in the contract view
+  - More responsive layout
+  - Better alignment
+  - Right-mouse click in time entries list in the contract view
 
 ------------
 
