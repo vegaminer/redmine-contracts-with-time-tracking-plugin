@@ -188,9 +188,9 @@ zh:
   button_assign: 关联到合同
   button_unassign: 解除合同关联
   button_unassign_multiple: 解除合同关联
-  button_assign_contract: '关联合同： %{contract}'
-  button_unassign_contract: '解除合同： %{contract} 的关联关系'
+  button_assign_contract: '关联合同：%{contract}'
+  button_unassign_contract: '解除与合同：%{contract} 的关联'
 
-  settings_enable_smart_time_entries: Include all time entries in the project that fall in the contract dates range
+  settings_enable_smart_time_entries: 包括合同日期范围内项目中的所有工时记录
 
   enumeration_contract_categories: 合同类别
