@@ -135,3 +135,7 @@ div.flash.contract_warning {
 }
 
 .icon-link { background-image: url(../../../images/link.png); }
+
+#content .tabs {
+  clear: both;
+}
