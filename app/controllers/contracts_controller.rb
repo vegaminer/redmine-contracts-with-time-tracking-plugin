@@ -83,7 +83,7 @@ class ContractsController < ApplicationController
 
     if params[:invoices_tab_active]
       @show_invoices = true
-      @invoices = ContractsInvoice.order(:invoice_date => "desc").all
+      @invoices = ContractsInvoice.order(:invoice_date => "desc", :id => "desc").all
     end
 
     # Show fixed contracts if the fixed tab is selected or if there aren't any hourly contracts.
@@ -182,10 +182,10 @@ class ContractsController < ApplicationController
     @invoices_tab = (params[:contracts_invoices] == 'true')
     @summary_tab = (params[:contract_summary] == 'true')
     if @expenses_tab
-      @expenses = @contract.contracts_expenses
+      @expenses = @contract.contracts_expenses.order(:expense_date => "desc", :id => "desc").all
     end
     if @invoices_tab
-      @invoices = @contract.contracts_invoices
+      @invoices = @contract.contracts_invoices.order(:invoice_date => "desc", :id => "desc").all
     end
     if @summary_tab
       @issues = []
