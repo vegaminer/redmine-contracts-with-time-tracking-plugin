@@ -7,7 +7,7 @@
   <% end %>
   <% if !@contract.is_locked && User.current.allowed_to?(:create_invoices, @project) %>
     <%= link_to l(:label_add_invoice), { :controller => 'contracts_invoices', :action => 'new', :project_id => @project.identifier, :contract_id => @contract.id  }, :class => 'icon icon-add' %> &nbsp;&nbsp;&nbsp;
-  <% end %>  
+  <% end %>
 </div>
 
 <h2>
@@ -155,7 +155,7 @@
                   <td class="amount"><%= l(:field_unbilled) %></td>
                   <td class="amount"><%= number_to_currency(totalBillable - totalInvoiced) %></td>
                 </tr>
-            <% end %>              
+            <% end %>
             </tbody>
           </table>
         </div>
