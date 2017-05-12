@@ -11,7 +11,7 @@
     <% @project.contracts.where(:is_locked => false).order("id ASC").each do |contract| %>
       <%#Add contract to list if not locked and if different that at least one already assigned %>
       <% if !te_assignable.select{ |te| te.contract != contract}.empty? %>
-        <% menuEntries << '<li>' + (context_menu_link l(:button_assign_contract, :contract => contract.title), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => contract, :project_id => @project, :time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link', :method => "put") + '</li>' %>
+        <% menuEntries << '<li>' + (context_menu_link l(:button_assign_contract, :contract => contract.getDisplayTitle), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => contract, :project_id => @project, :time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link', :method => "put") + '</li>' %>
       <% end %>
     <% end %>
   <% end %>
@@ -22,7 +22,7 @@
       <% menuEntries << '<li>' + (context_menu_link l(:button_unassign_multiple), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => te_unassignable[0].contract_id, :project_id => @project, :unassoc_time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link-break', :method => "put") + '</li>' %>
     <% else %>
       <% # All assigned to the same.  Write its name. %>
-      <% menuEntries << '<li>' + (context_menu_link l(:button_unassign_contract, :contract => unique_contract_assigned.title), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => unique_contract_assigned.id, :project_id => @project, :unassoc_time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link-break', :method => "put") + '</li>' %>
+      <% menuEntries << '<li>' + (context_menu_link l(:button_unassign_contract, :contract => unique_contract_assigned.getDisplayTitle), {:controller => 'contracts', :action => 'assoc_time_entries_with_contract', :id => unique_contract_assigned.id, :project_id => @project, :unassoc_time_entries => params[:ids], :back_url => params[:back_url]}, :class => 'icon-link-break', :method => "put") + '</li>' %>
     <% end %>
   <% end %>
   <li class="folder">
