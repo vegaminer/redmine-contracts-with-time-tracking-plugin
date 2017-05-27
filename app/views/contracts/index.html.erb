@@ -1,8 +1,8 @@
-<div class="contextual">
-  <% if @project != nil %>
+<% if @project != nil %>
+  <div class="contextual">
     <%= link_to_if_authorized l(:label_new_contract), { :controller => 'contracts', :action => 'new', :project_id => @project.identifier }, :class => 'icon icon-add' %>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
 <% if (@project != nil) %>
   <h2>
