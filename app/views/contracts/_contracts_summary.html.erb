@@ -14,10 +14,12 @@
         </h3>
         <p class="bigbold"><%= number_to_currency(@total_purchased_fixed) %></p>
       </td>
-      <td>
-        <h3><%= l(:label_total_billable_fixed) %></h3>
-        <p class="green bigbold"><%= number_to_currency(@total_amount_billable_fixed) %></p>
-      </td>
+      <% if @total_amount_billable_fixed > 0 %>
+        <td>
+          <h3><%= l(:label_total_billable_fixed) %></h3>
+          <p class="green bigbold"><%= number_to_currency(@total_amount_billable_fixed) %></p>
+        </td>
+      <% end %>
     </tr>
   <% end %>
   <% if @show_tabs || @show_fixed_contracts == false %>
@@ -34,10 +36,12 @@
         <p><%= l(:label_or) %></p>
         <p class="blue bigbold">~<%= l_hours @total_remaining_hours %></p>
       </td>
-      <td>
-        <h3><%= l(:label_total_billable_hourly) %></h3>
-        <p class="green bigbold"><%= number_to_currency(@total_amount_billable_hourly) %></p>
-      </td>
+      <% if @total_amount_billable_hourly > 0 %>
+        <td>
+          <h3><%= l(:label_total_billable_hourly) %></h3>
+          <p class="green bigbold"><%= number_to_currency(@total_amount_billable_hourly) %></p>
+        </td>
+      <% end %>
     </tr>
   <% end %>
 </table>

@@ -101,10 +101,13 @@ class ContractsController < ApplicationController
     @total_purchased_hourly_hours = hourly_contracts.map(&:hours_purchased).inject(0, &:+)
     @total_amount_remaining_hourly = hourly_contracts.map(&:amount_remaining).inject(0, &:+)
     @total_remaining_hours = hourly_contracts.map(&:hours_remaining).inject(0, &:+)
-    @total_amount_billable_fixed = fixed_contracts.sum { |contract| contract.smart_billable_amount_total } -
-        fixed_contracts.sum { |contract| contract.invoices_amount }
-    @total_amount_billable_hourly = hourly_contracts.sum { |contract| contract.smart_billable_amount_total } -
-        hourly_contracts.sum { |contract| contract.invoices_amount }
+    # Show only billable totals for contract that user can see the hourly rate
+    @total_amount_billable_fixed = fixed_contracts
+                                       .select{ |contrat| User.current.allowed_to?(:view_hourly_rate, contrat.project) }
+                                       .sum { |contract| contract.smart_billable_amount_total - contract.invoices_amount }
+    @total_amount_billable_hourly = hourly_contracts
+                                        .select{ |contrat| User.current.allowed_to?(:view_hourly_rate, contrat.project) }
+                                        .sum { |contract| contract.smart_billable_amount_total - contract.invoices_amount }
 
     set_contract_visibility
 
