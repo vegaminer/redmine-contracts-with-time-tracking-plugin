@@ -1,6 +1,6 @@
 <h2>
   <% if @contracts_invoice.contract %>
-    <%= link_to @contracts_invoice.contract.title, {:controller => 'contracts', :action => 'show', :project_id => @contracts_invoice.contract.project.identifier, :id => @contracts_invoice.contract.id } %> »
+    <%= link_to @contracts_invoice.contract.getDisplayTitle, {:controller => 'contracts', :action => 'show', :project_id => @contracts_invoice.contract.project.identifier, :id => @contracts_invoice.contract.id } %> »
   <% end %>
   <%= l(:label_new_invoice) %>
 </h2>

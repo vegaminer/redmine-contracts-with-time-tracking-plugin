@@ -16,7 +16,7 @@ module Contracts
 							if User.current.allowed_to?(:view_hourly_rate, @time_entry.project)
 								contract = Contract.contract_for_time_entry(@time_entry)
 								if (contract)
-									notice = l(:text_time_entry_added_to_contract, :contract => view_context.link_to(contract.title, url_for({ :controller => 'contracts', :action => 'show', :project_id => contract.project.identifier, :id => contract.id })))
+									notice = l(:text_time_entry_added_to_contract, :contract => view_context.link_to(contract.getDisplayTitle, url_for({ :controller => 'contracts', :action => 'show', :project_id => contract.project.identifier, :id => contract.id })))
 									if flash[:notice].nil?
 										flash[:contract] = notice
 									else
