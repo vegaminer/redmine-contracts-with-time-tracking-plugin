@@ -1,3 +1,4 @@
+<%= form_tag({}, :data => {:cm_url => time_entries_context_menu_path}) do -%>
 <%= hidden_field_tag 'back_url', url_for(params) %>
 <%= hidden_field_tag 'contract_id', @contract.id unless @contract.nil? %>
 <div class="autoscroll">
@@ -49,5 +50,6 @@
 <% unless @time_entries_page.empty? %>
     <span class="pagination"><%= pagination_links_full @entry_pages, @entry_count %></span>
 <% end %>
+<% end %>
 
-<%= context_menu time_entries_context_menu_path %>
+<%= context_menu %>
