@@ -1,19 +1,20 @@
 <ul>
-  <% if @can[:edit] %>
-    <li class="folder">
-      <a href="#" class="submenu"><%= l(:field_status) %></a>
-      <ul>
-        <% ContractsInvoice::INVOICE_STATUS.each do |s| %>
-          <li><%= context_menu_link I18n.t("invoice_status.#{s}"), {:controller => 'contracts_invoices', :action => 'bulk_status', :ids => @invoices.collect(&:id), :project_id => @invoices.first.contract.project, :back_url => @back, :status => s},
-                                    :method => :post, :selected => ((@invoice && s == @invoice.status) || (@invoices && @invoices.collect(&:status).uniq.count == 1 && @invoices.collect(&:status).uniq.first == s)), :disabled => !@can[:edit] %></li>
-        <% end %>
-      </ul>
-    </li>
-  <% end %>
+  <li class="folder">
+    <a href="#" class="submenu"><%= l(:field_status) %></a>
+    <ul>
+      <% ContractsInvoice::INVOICE_STATUS.each do |s| %>
+        <li><%= context_menu_link I18n.t("invoice_status.#{s}"), {:controller => 'contracts_invoices', :action => 'bulk_status', :ids => @invoices.collect(&:id), :project_id => @invoices.first.contract.project, :back_url => @back, :status => s},
+                                  :method => :post, :selected => ((@invoice && s == @invoice.status) || (@invoices && @invoices.collect(&:status).uniq.count == 1 && @invoices.collect(&:status).uniq.first == s)), :disabled => !@can[:edit] %></li>
+      <% end %>
+    </ul>
+  </li>
   <% if @invoice %>
     <li><%= context_menu_link l(:button_edit), {:controller => 'contracts_invoices', :action => 'edit', :id => @invoice, :project_id => @invoice.contract.project},
                               :class => 'icon-edit', :disabled => !@can[:edit] %></li>
     <li><%= context_menu_link l(:button_delete), {:controller => 'contracts_invoices', :action => 'destroy', :id => @invoice, :project_id => @invoice.contract.project, :back_url => @back},
                               :method => :delete, :confirm => l(:text_are_you_sure), :class => 'icon-del', :disabled => !@can[:delete] %></li>
+  <% end %>
+  <% if @invoices.count > 1 %>
+    <li class="context-menu-sum"><%= l(:invoice_sum, :sum => number_to_currency(@invoices.map(&:amount).inject(0, &:+))) %></li>
   <% end %>
 </ul>

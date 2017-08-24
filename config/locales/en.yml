@@ -183,6 +183,7 @@ en:
     draft: "Draft"
     sent: "Sent"
     paid: "Paid"
+  invoice_sum: "Sum: %{sum}"
   notice_failed_to_save_invoices: "Failed to save %{count} invoice(s) on %{total} selected: %{ids}."
 
   button_assign: Associate to contract

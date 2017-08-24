@@ -136,3 +136,7 @@ div.flash.contract_warning {
 
 .icon-link { background-image: url(../../../images/link.png); }
 
+#context-menu > ul > li.context-menu-sum
+{
+  padding-left: 21px;
+}
