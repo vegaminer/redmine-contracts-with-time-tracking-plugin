@@ -17,7 +17,14 @@
       <% if @total_amount_billable_fixed > 0 %>
         <td>
           <h3><%= l(:label_total_billable_fixed) %></h3>
-          <p class="green bigbold"><%= number_to_currency(@total_amount_billable_fixed) %></p>
+          <% if @total_amount_billable_fixed_limit < @total_amount_billable_fixed %>
+              <p>
+                <span class="strike red bigbold"><%= number_to_currency(@total_amount_billable_fixed) %></span>
+                <span class="green bigbold"><%= number_to_currency(@total_amount_billable_fixed_limit) %></span>
+              </p>
+          <% else %>
+              <p class="green bigbold"><%= number_to_currency(@total_amount_billable_fixed_limit) %></p>
+          <% end %>
         </td>
       <% end %>
     </tr>
@@ -39,7 +46,14 @@
       <% if @total_amount_billable_hourly > 0 %>
         <td>
           <h3><%= l(:label_total_billable_hourly) %></h3>
-          <p class="green bigbold"><%= number_to_currency(@total_amount_billable_hourly) %></p>
+          <% if @total_amount_billable_hourly_limit < @total_amount_billable_hourly %>
+            <p>
+              <span class="strike red bigbold"><%= number_to_currency(@total_amount_billable_hourly) %></span>
+              <span class="green bigbold"><%= number_to_currency(@total_amount_billable_hourly_limit) %></span>
+            </p>
+          <% else %>
+            <p class="green bigbold"><%= number_to_currency(@total_amount_billable_hourly_limit) %></p>
+          <% end %>
         </td>
       <% end %>
     </tr>

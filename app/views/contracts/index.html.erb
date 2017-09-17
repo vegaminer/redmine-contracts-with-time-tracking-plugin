@@ -26,6 +26,11 @@
 <% if @show_invoices %>
   <%= render 'invoices_list' %>
 <% else %>
+  <%= form_tag({ :controller => 'contracts', :action => (controller.action_name == "index" ? "index" : "all"), :project_id => (controller.action_name == "index" ? @project : "") }, :method => :get) do %>
+      <%= label_tag('contract_list_show_locked_contracts', l(:label_show_locked_contracts)) %>
+      <%= check_box 'contract_list', :show_locked_contracts, {:checked => session[:show_locked_contracts]}, "true", "false" %>
+      <%= submit_tag(l(:text_apply)) %>
+  <% end %>
   <% if @contracts.empty? %>
     <p class="nodata"><%= l(:label_no_data) %></p>
   <% else %>

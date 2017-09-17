@@ -5,8 +5,10 @@ class ContractsController < ApplicationController
   Struct.new("DefaultContract", :project, :hours)
 
   def index
-    fixed_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => true)
-    hourly_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => false)
+    show_locked = session[:show_locked_contracts] || (params[:contract_list].present? && params[:contract_list][:show_locked_contracts] == 'true')
+
+    fixed_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => true).where("is_locked = false or is_locked = ?", show_locked)
+    hourly_contracts = Contract.order("start_date ASC").where(:project_id => @project.id, :is_fixed_price => false).where("is_locked = false or is_locked = ?", show_locked)
 
     # Show the tabs only if there are hourly and fixed contracts within the same project.
     if fixed_contracts.size > 0 && hourly_contracts.size > 0
@@ -28,9 +30,13 @@ class ContractsController < ApplicationController
     @total_purchased_fixed = fixed_contracts.map(&:purchase_amount).inject(0, &:+)
     @total_amount_billable_fixed = fixed_contracts.map(&:smart_billable_amount_total).inject(0, &:+) -
         fixed_contracts.map(&:invoices_amount).inject(0, &:+)
+    @total_amount_billable_fixed_limit = fixed_contracts.map(&:smart_billable_amount_total_limit).inject(0, &:+) -
+        fixed_contracts.map(&:invoices_amount).inject(0, &:+)
     @total_purchased_hourly = hourly_contracts.map(&:purchase_amount).inject(0, &:+)
     @total_purchased_hourly_hours = hourly_contracts.map(&:hours_purchased).inject(0, &:+)
     @total_amount_billable_hourly = hourly_contracts.map(&:smart_billable_amount_total).inject(0, &:+) -
+        hourly_contracts.map(&:invoices_amount).inject(0, &:+)
+    @total_amount_billable_hourly_limit = hourly_contracts.map(&:smart_billable_amount_total_limit).inject(0, &:+) -
         hourly_contracts.map(&:invoices_amount).inject(0, &:+)
     @total_amount_remaining_hourly = hourly_contracts.map(&:amount_remaining).inject(0, &:+)
     @total_remaining_hours = hourly_contracts.map(&:hours_remaining).inject(0, &:+)
@@ -66,14 +72,16 @@ class ContractsController < ApplicationController
   end
 
   def all
+    show_locked = session[:show_locked_contracts] || (params[:contract_list].present? && params[:contract_list][:show_locked_contracts] == 'true')
+
     user = User.current
     projects = Project.select { |project| user.allowed_to?(:view_all_contracts_for_project, project) }
 
-    fixed_contracts = projects.collect { |project| project.contracts.order("start_date ASC").where(:is_fixed_price => '1') }
+    fixed_contracts = projects.collect { |project| project.contracts.order("start_date ASC").where(:is_fixed_price => '1').where("is_locked = false or is_locked = ?", show_locked) }
     fixed_contracts.flatten!
-    hourly_contracts = projects.collect { |project| project.contracts.order("start_date ASC").where(:is_fixed_price => '0') }
+    hourly_contracts = projects.collect { |project| project.contracts.order("start_date ASC").where(:is_fixed_price => '0').where("is_locked = false or is_locked = ?", show_locked) }
     hourly_contracts.flatten!
-    all_contracts = projects.collect { |project| project.contracts.order("start_date ASC") }
+    all_contracts = projects.collect { |project| project.contracts.order("start_date ASC").where("is_locked = false or is_locked = ?", show_locked) }
     all_contracts.flatten!
 
     # Show the tabs only if there are hourly and fixed contracts within the same project.
@@ -105,9 +113,15 @@ class ContractsController < ApplicationController
     @total_amount_billable_fixed = fixed_contracts
                                        .select{ |contrat| User.current.allowed_to?(:view_hourly_rate, contrat.project) }
                                        .sum { |contract| contract.smart_billable_amount_total - contract.invoices_amount }
+    @total_amount_billable_fixed_limit = fixed_contracts
+                                              .select{ |contrat| User.current.allowed_to?(:view_hourly_rate, contrat.project) }
+                                              .sum { |contract| contract.smart_billable_amount_total_limit - contract.invoices_amount }
     @total_amount_billable_hourly = hourly_contracts
                                         .select{ |contrat| User.current.allowed_to?(:view_hourly_rate, contrat.project) }
                                         .sum { |contract| contract.smart_billable_amount_total - contract.invoices_amount }
+    @total_amount_billable_hourly_limit = hourly_contracts
+                                        .select{ |contrat| User.current.allowed_to?(:view_hourly_rate, contrat.project) }
+                                        .sum { |contract| contract.smart_billable_amount_total_limit - contract.invoices_amount }
 
     set_contract_visibility
 
@@ -233,7 +247,7 @@ class ContractsController < ApplicationController
         end
       end
       flash[:notice] = l(:text_contract_updated)
-      redirect_to :action => "show", :id => @contract.id
+      redirect_back_or_default url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })
     else
       flash[:error] = "* " + @contract.errors.full_messages.join("</br>* ")
       redirect_to :action => "edit", :id => @contract.id
@@ -269,11 +283,7 @@ class ContractsController < ApplicationController
     @contract = Contract.find(params[:id])
     if @contract.destroy
       flash[:notice] = l(:text_contract_deleted)
-      if !params[:project_id].nil?
-        redirect_to :action => "index", :project_id => params[:project_id]
-      else
-        redirect_to :action => "all"
-      end
+      redirect_back_or_default url_for({ :controller => 'contracts', :action => 'index', :project_id => params[:project_id] })
     else
       redirect_to(:back)
     end
@@ -356,11 +366,7 @@ class ContractsController < ApplicationController
       end
     end
 
-    if params[:view] == 'index'
-      redirect_to :action => "index", :project_id => params[:project_id]
-    else
-      redirect_to url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })
-    end
+    redirect_back_or_default url_for({ :controller => 'contracts', :action => 'show', :project_id => @contract.project.identifier, :id => @contract.id })
   end
 
   def tooltips

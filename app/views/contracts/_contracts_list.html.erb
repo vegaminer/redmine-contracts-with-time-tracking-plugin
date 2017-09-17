@@ -1,9 +1,3 @@
-<%= form_tag({ :controller => 'contracts', :action => (controller.action_name == "index" ? "index" : "all"), :project_id => (controller.action_name == "index" ? @project : "") }, :method => :get) do %>
-  <%= label_tag('contract_list_show_locked_contracts', l(:label_show_locked_contracts)) %>
-  <%= check_box 'contract_list', :show_locked_contracts, {:checked => session[:show_locked_contracts]}, "true", "false" %>
-  <%= submit_tag(l(:text_apply)) %>
-<% end %>
-
 <div class="autoscroll">
 <table class="contracts-list list">
   <thead>
@@ -66,7 +60,13 @@
         <td class="amount green"><%= number_to_currency(contract.amount_remaining) %></td>
         <td class="amount green">
         <% if User.current.allowed_to?(:view_hourly_rate, contract.project) %>
-          <%= number_to_currency(contract.smart_billable_amount_total - contract.invoices_amount) %>
+          <% if contract.smart_billable_amount_total_limit < contract.smart_billable_amount_total %>
+            <span class="strike red"><%= number_to_currency(contract.smart_billable_amount_total - contract.invoices_amount) %></span>
+            <% billable = contract.smart_billable_amount_total_limit - contract.invoices_amount %>
+            <span class="<%= billable < 0 ? "red" : "green"%>"><%= number_to_currency(billable) %>
+          <% else %>
+            <%= number_to_currency(contract.smart_billable_amount_total_limit - contract.invoices_amount) %>
+          <% end %>
         <% end %>
         </td>
         <td class="hours"><%= number_with_precision contract.smart_hours_spent, :precision => 2 %></td>
@@ -84,20 +84,20 @@
         <td>
           <% if (User.current.allowed_to?(:edit_contracts, contract.project)) %>
             <% if contract.is_locked %>
-              <%= link_to image_tag("unlock.png"), { :controller => 'contracts', :action => 'lock', :project_id => contract.project.identifier, :id => contract.id, :lock => false, :view => 'index' }, :method => :put, :title => l(:label_unlock) %>
+              <%= link_to image_tag("unlock.png"), { :controller => 'contracts', :action => 'lock', :project_id => contract.project.identifier, :id => contract.id, :lock => false, :back_url => url_for(params) }, :method => :put, :title => l(:label_unlock) %>
             <% else %>
-              <%= link_to image_tag("locked.png"), { :controller => 'contracts', :action => 'lock', :project_id => contract.project.identifier, :id => contract.id, :lock => true, :view => 'index' }, :method => :put, :title => l(:label_lock) %>
+              <%= link_to image_tag("locked.png"), { :controller => 'contracts', :action => 'lock', :project_id => contract.project.identifier, :id => contract.id, :lock => true, :back_url => url_for(params) }, :method => :put, :title => l(:label_lock) %>
             <% end %>
           <% end %>
         </td>
         <td>
           <% if !contract.is_locked && User.current.allowed_to?(:edit_contracts, contract.project) %>
-            <%= link_to image_tag("edit.png"), { :controller => 'contracts', :action => 'edit', :project_id => contract.project.identifier, :id => contract.id }, :title => l(:label_edit) %>
+            <%= link_to image_tag("edit.png"), { :controller => 'contracts', :action => 'edit', :project_id => contract.project.identifier, :id => contract.id, :back_url => url_for(params)}, :title => l(:label_edit) %>
           <% end %>
         </td>
         <td>
           <% if !contract.is_locked && (User.current.allowed_to?(:delete_contracts, contract.project)) %>
-              <%= link_to image_tag("delete.png"), { :controller => 'contracts', :action => 'destroy', :project_id => contract.project.identifier, :id => contract.id }, :method => :delete, 
+              <%= link_to image_tag("delete.png"), { :controller => 'contracts', :action => 'destroy', :project_id => contract.project.identifier, :id => contract.id, :back_url => url_for(params) }, :method => :delete,
               :title => l(:label_delete), :data => {:confirm => l(:text_are_you_sure_delete_title, contract.getDisplayTitle)} %>
           <% end %>
         </td>

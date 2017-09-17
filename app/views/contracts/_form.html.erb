@@ -2,6 +2,7 @@
 <% controller.action_name == "new" || controller.action_name == "create"  ? method = :post : method = :put %>
 
 <%= labelled_form_for @contract, :url => { :action => action }, :method => method do |f| %>
+  <%= back_url_hidden_field_tag %>
   <%= f.hidden_field :project_id, :value => @project.id %>
   <div class="box tabular">
     <p><%= f.select :contract_type, Contract::CONTRACT_TYPES.map { |s| [I18n.t("contract_types.#{s}"), s] }, {}, {:disabled => action == 'update'} %>

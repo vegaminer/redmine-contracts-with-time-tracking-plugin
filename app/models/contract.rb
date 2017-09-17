@@ -167,8 +167,17 @@ class Contract < ActiveRecord::Base
     total_billable_amount
   end
 
+  def smart_billable_amount_total_limit
+    billable = calculate_billable_amount_total
+    if billable > (self.purchase_amount - self.expenses_total)
+      self.purchase_amount - self.expenses_total
+    else
+      billable
+    end
+  end
+
   def amount_remaining
-    self.purchase_amount - self.smart_billable_amount_total - self.expenses_total
+    self.purchase_amount - self.smart_billable_amount_total_limit - self.expenses_total
   end
 
   def hours_remaining
