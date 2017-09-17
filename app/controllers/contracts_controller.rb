@@ -1,6 +1,8 @@
 class ContractsController < ApplicationController
-  before_filter :find_project, :authorize, :only => [:index, :show, :new, :create, :edit, :update, :destroy, 
+  before_filter :find_project, :authorize, :only => [:index, :show, :new, :create, :edit, :update, :destroy,
                                                      :add_time_entries, :assoc_time_entries_with_contract, :series]
+  before_filter :set_contract_visibility, :only => [:index, :all, :series]
+
 
   Struct.new("DefaultContract", :project, :hours)
 
@@ -52,8 +54,6 @@ class ContractsController < ApplicationController
     unless te.empty?
       @defaultContracts << Struct::DefaultContract.new(@project, te.sum { |entry| entry.hours })
     end
-
-    set_contract_visibility
 
   end
 
@@ -122,8 +122,6 @@ class ContractsController < ApplicationController
     @total_amount_billable_hourly_limit = hourly_contracts
                                         .select{ |contrat| User.current.allowed_to?(:view_hourly_rate, contrat.project) }
                                         .sum { |contract| contract.smart_billable_amount_total_limit - contract.invoices_amount }
-
-    set_contract_visibility
 
     @defaultContracts = []
 
@@ -260,8 +258,6 @@ class ContractsController < ApplicationController
 
     # Calculate metrics for display.
     @total_purchased_fixed = @contracts.map(&:purchase_amount).inject(0, &:+)
-
-    set_contract_visibility
 
     render "index"
   end
