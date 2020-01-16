@@ -7,6 +7,6 @@
  table name is now contracts_expenses.
 =end
 
-class CreateExpenses < ActiveRecord::Migration
+class CreateExpenses < ActiveRecord::Migration[4.2]
 
 end

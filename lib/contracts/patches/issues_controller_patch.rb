@@ -5,7 +5,8 @@ module Contracts
 	module IssuesControllerPatch
 		def self.included(base)
 	  		base.class_eval do
-	  			after_filter :check_flash_messages, :only => [:update]
+	  			#after_filter :check_flash_messages, :only => [:update]
+				after_action :check_flash_messages, :only => [:update]
 
 	  			def check_flash_messages
 					return if @time_entry.nil?

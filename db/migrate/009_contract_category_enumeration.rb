@@ -1,4 +1,4 @@
-class ContractCategoryEnumeration < ActiveRecord::Migration
+class ContractCategoryEnumeration < ActiveRecord::Migration[4.2]
   	def change
     	add_column :contracts, :category_id, :integer
 

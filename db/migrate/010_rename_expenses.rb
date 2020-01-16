@@ -3,7 +3,7 @@
  contracts_expenses table
 =end
 
-class RenameExpenses < ActiveRecord::Migration
+class RenameExpenses < ActiveRecord::Migration[4.2]
   def change
     create_table :contracts_expenses do |t|
       t.string :name

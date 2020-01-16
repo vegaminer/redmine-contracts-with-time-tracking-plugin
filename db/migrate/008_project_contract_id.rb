@@ -1,4 +1,4 @@
-class ProjectContractId < ActiveRecord::Migration
+class ProjectContractId < ActiveRecord::Migration[4.2]
   def change
     add_column :contracts, :project_contract_id, :integer, :default => 1
     Contract.reset_column_information

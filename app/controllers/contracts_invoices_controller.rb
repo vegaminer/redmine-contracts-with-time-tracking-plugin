@@ -1,6 +1,6 @@
 class ContractsInvoicesController < ApplicationController
-  before_filter :set_project, :authorize, :only => [:new, :edit, :update, :create, :destroy]
-  before_filter :set_invoice, :only => [:edit, :update, :destroy]
+  before_action :set_project, :authorize, :only => [:new, :edit, :update, :create, :destroy]
+  before_action :set_invoice, :only => [:edit, :update, :destroy]
 
   helper :context_menus
 

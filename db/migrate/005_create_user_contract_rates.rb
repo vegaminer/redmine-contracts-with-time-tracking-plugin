@@ -1,4 +1,4 @@
-class CreateUserContractRates < ActiveRecord::Migration
+class CreateUserContractRates < ActiveRecord::Migration[4.2]
   def change
     create_table :user_contract_rates do |t|
       t.integer :user_id

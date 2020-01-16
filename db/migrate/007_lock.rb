@@ -1,4 +1,4 @@
-class Lock < ActiveRecord::Migration
+class Lock < ActiveRecord::Migration[4.2]
   def change
     add_column :contracts, :is_locked, :boolean, :default => false
     add_column :contracts, :hours_worked, :float, :length => 8, :decimals => 2

@@ -1,4 +1,4 @@
-class AddRecurringContracts < ActiveRecord::Migration
+class AddRecurringContracts < ActiveRecord::Migration[4.2]
   def up
     unless column_exists? :contracts, :recurring_frequency
       add_column :contracts, :recurring_frequency, :integer, :default => 0
