@@ -21,6 +21,10 @@ ru:
   permission_edit_expenses: Редактировать расходы
   permission_delete_expenses: Удалить расходы
   permission_view_expenses: Просмотреть расходы
+  permission_create_invoices: Создать счета
+  permission_edit_invoices: Редактировать счета
+  permission_delete_invoices: Удалить счета
+  permission_view_invoices: Просмотреть счета
 
   contracts: Контракты
   label_contracts: Контракты
@@ -32,6 +36,7 @@ ru:
   label_add_time_entries: Добавить работы
   label_add_time_entries: Добавить работы (массово)
   label_add_expense: Добавить расходы
+  label_add_invoice: Добавить счёт
   label_log_time: Зафиксировать время
   label_edit: Редактировать
   label_delete: Удалить
@@ -44,6 +49,7 @@ ru:
   label_hours: Часы
   label_contractor_rate: Ставка подрядчика
   label_billable_amount: Оплачиваемая сумма
+  label_billable: К оплате
   label_time_entries: Список работ
   label_hourly_priced_contracts: Почасовые контракты
   label_effective_rate: Эффективная ставка
@@ -58,31 +64,37 @@ ru:
   label_comments: Комментарий
   label_apply: Применить
   label_name: Название
+  label_number: Номер
   label_agreed_on: Заключен
   label_purchased: Оплачено
   label_remaining: Осталось
   label_hours_worked: Часов потрачено
   label_hours_left: "~Часов осталось"
-
-  label_total_purchased: Всего оплачено по контрактам
-  label_total_remaining: Всего осталось по контрактам
+  label_total_purchased: Всего оплачено по всем контрактам
+  label_total_remaining: Всего осталось по всем контрактам
+  label_total_billable: К оплате по всем контрактам
   label_total_fixed: Всего оплачено по фиксированным контрактам
   label_total_series: Всего оплачено по серийным контрактам
   label_total_hourly: Всего оплачено по часовым контрактам
   label_remaining_hourly: Остаток по часовым контрактам
+  label_total_billable_fixed: К оплате по фикс контрактам
+  label_total_billable_hourly: К оплате по почасовым контрактам
   label_or: "-или-"
-
   label_create_contract: Создать контракт
   label_update_contract: Обновить контракт
   label_contract_empty: Без контракта
   label_select_contract: "[Выберите контракт]"
   label_save_expense: Записать расходы
+  label_save_invoice: Записать счёт
   label_expenses: Расходы
+  label_invoices: Счета
   label_summary: Сводка
   label_description: Описание
   label_amount: Сумма
   label_edit_expense: Редактировать расходы
+  label_edit_invoice: Редактировать счёт
   label_new_expense: Добавить расходы
+  label_new_invoice: Добавить счёт
   label_lock: Заблокировать
   label_unlock: Разблокировать
   label_show_locked_contracts: Показать заблокированные контракты
@@ -98,6 +110,7 @@ ru:
   text_are_you_sure_stop_recurring: "Вы уверены, что хотите остановить этот повторяющийся контракт?"
   text_are_you_sure_delete_time_entry: "Вы действительно хотите удалить эту запись?"
   text_are_you_sure_delete_expense: "Вы уверены, что хотите удалить эти расходы?"
+  text_are_you_sure_delete_invoice: "Вы уверены, что хотите удалить этот счет?"
   text_time_exceeded_time_remaining: "Эта работа превышает оставшееся время по контракту на %{hours_over}.\nДля работы в рамках контракта укажите время не более %{hours_remaining}."
   text_must_come_after_agreement_date: должна быть не ранее даты соглашения
   text_must_come_after_start_date: должна быть позже даты начала
@@ -107,6 +120,8 @@ ru:
   text_hours_over_contract: "Лимит по контракту превышен на %{hours_over}."
   text_split_time_entry_saved: Ваша временная запись была разделена на две записи, так как она превысила оставшееся время по выбранному контракту. Вторая запись была добавлена к новому контракту, находящемуся на рассмотрении.
   text_one_time_entry_saved: Был создан новый ожидающий рассмотрения контракт, и ваше время было сохранено там, потому что выбранный вами контракт не имел оставшегося времени.
+  text_time_entry_added_to_contract: "Запись о времени появится в следующем договоре: %{contract}."
+  text_time_entry_not_added_to_contract: "Запись о времени не будет отображаться ни в одном контракте."
   text_hours_too_large: is invalid. Сумма превышает оставшееся время плюс размер нового контракта.
   text_invalid_rate: "Ставка подрядчика должна быть равна нулю или больше."
   text_invalid_issue_id: "ошибочный номер (ID) задачи"
@@ -114,7 +129,9 @@ ru:
   text_second_time_entry_failure: "что-то пошло не так. Вторая часть этой записи с раздельным временем не может быть сохранена. %{error}"
   text_auto_contract_failure: "что-то пошло не так. Новый контракт для этой записи с раздельным временем не может быть сохранён. %{error}"
   text_expense_created: 'Расходы были успешно созданы.'
+  text_invoice_created: 'Счет был успешно создан.'
   text_expense_updated: 'Расходы были успешно обновлены.'
+  text_invoice_updated: 'Счет был успешно обновлен.'
   text_agreement_pending: 'ожидается принятие решения'
   text_no_end_date: 'без даты окончания'
   text_na: 'Не применимо'
@@ -122,7 +139,12 @@ ru:
   text_contract_unlocked: Контракт был успешно разблокирован.
   text_locked_contract_cache_updated: Эта запись связана с заблокированным контрактом. Кэшированные значения контракта были обновлены, чтобы отразить ваши изменения.
   text_expenses_uneditable: Расходы по данному договору не подлежат редактированию (договор заблокирован).
+  text_invoices_uneditable: Счета по данному договору не подлежат редактированию (договор заблокирован).
+  text_contract_is_locked: Эта операция не может быть выполнена (договор заблокирован).
+  text_some_contracts_are_locked: Не все операции могут быть выполнены (некоторые договора заблокирован).
+  text_some_time_entries_were_added: Некоторые несвязанные записи времени теперь будут появляться в %{contract}. Пожалуйста, просмотрите контракт.
   text_expense_deleted: Расходы удалены.
+  text_invoice_deleted: Счёт удалён.
   text_apply: Применить
   text_previous_id: "В последнем контракте, созданном для этого проекта, использовался ID %{previous_id}."
   text_contract_category_helper: "[Необязательно] Если заголовок не указан, в заголовке по умолчанию будет использоваться эта категория. Они управляются перечислениями."
@@ -149,8 +171,28 @@ ru:
 
   field_expense_name: Наименование
   field_expense_date: Дата платежа
+  field_invoice_date: Дата счёта
+  field_invoice_number: Номер
   field_amount: Сумма
   field_expense_contract: Контракт
+  field_invoice_contract: Контракт
   field_issue: Задача (ID)
+  field_unbilled: Не оплачен
+  field_invoiced: Выставлен счёт
 
-  enumeration_contract_categories: Категории контракта
+  invoice_status:
+    draft: "Черновик"
+    sent: "Отправлен"
+    paid: "Оплачен"
+  invoice_sum: "Сумма: %{sum}"
+  notice_failed_to_save_invoices: "Не удалось сохранить %{count} счёт(а) для %{total} выбранных: %{ids}."
+
+  button_assign: Связать с договором
+  button_unassign: Разорвать связь с договором
+  button_unassign_multiple: Разорвать связь с договорами
+  button_assign_contract: 'Связать с %{contract}'
+  button_unassign_contract: 'Разорвать связь с %{contract}'
+
+  settings_enable_smart_time_entries: Включить в проект все временные записи, которые попадают в диапазон дат заключения контракта.
+
+  enumeration_contract_categories: Категории контрактов
