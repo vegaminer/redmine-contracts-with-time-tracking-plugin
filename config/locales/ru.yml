@@ -1,5 +1,15 @@
 # Russian strings go here for Rails i18n
 ru:
+  contract_types:
+    hourly: "Почасовой"
+    fixed: "Фикс"
+    recurring: "Фикс-цикличный"
+  recurring_frequencies:
+    monthly: "Ежемесячно"
+    yearly: "Ежегодно"
+    completed: "По завершению"
+    not_recurring: "Нет"
+
   project_module_contracts: Контракты
   permission_view_all_contracts_for_project: Просмотр всех контрактов проекта
   permission_view_contract_details: Просмотр деталей контракта
@@ -7,13 +17,22 @@ ru:
   permission_create_contracts: Создание контрактов
   permission_delete_contracts: Удаление контрактов
   permission_view_hourly_rate: Просмотр стоимости часа
+  permission_create_expenses: Добавить расходы
+  permission_edit_expenses: Редактировать расходы
+  permission_delete_expenses: Удалить расходы
+  permission_view_expenses: Просмотреть расходы
 
   contracts: Контракты
   label_contracts: Контракты
+  label_series_titlой "Серийные повторяющиеся конкраты #%{series_id}"
   label_contract: Контракт
+  label_contractors_rates: Ставки подрядчика
   label_new_contract: Новый контракт
   label_editing_contract: Редактирование контракта
   label_add_time_entries: Добавить работы
+  label_add_time_entries: Добавить работы (массово)
+  label_add_expense: Добавить расходы
+  label_log_time: Зафиксировать время
   label_edit: Редактировать
   label_delete: Удалить
   label_view_contract: Просмотр контракта
@@ -23,13 +42,19 @@ ru:
   label_invoice: Счет
   label_members: Участники
   label_hours: Часы
+  label_contractor_rate: Ставка подрядчика
+  label_billable_amount: Оплачиваемая сумма
   label_time_entries: Список работ
+  label_hourly_priced_contracts: Почасовые контракты
+  label_effective_rate: Эффективная ставка
+  label_fixed_priced_contracts: Контракт с фиксированной стоимостью
   label_add_to_contract: Добавить
   label_date: Дата
   label_current_contract: Текущий контракт
   label_member: Участник
   label_activity: Действие
   label_issue: Задача
+  label_cost: Цена
   label_comments: Комментарий
   label_apply: Применить
   label_name: Название
@@ -38,15 +63,41 @@ ru:
   label_remaining: Осталось
   label_hours_worked: Часов потрачено
   label_hours_left: "~Часов осталось"
+
   label_total_purchased: Всего оплачено по контрактам
   label_total_remaining: Всего осталось по контрактам
-  label_or: "или"
+  label_total_fixed: Всего оплачено по фиксированным контрактам
+  label_total_series: Всего оплачено по серийным контрактам
+  label_total_hourly: Всего оплачено по часовым контрактам
+  label_remaining_hourly: Остаток по часовым контрактам
+  label_or: "-или-"
+
   label_create_contract: Создать контракт
   label_update_contract: Обновить контракт
   label_contract_empty: Без контракта
+  label_select_contract: "[Выберите контракт]"
+  label_save_expense: Записать расходы
+  label_expenses: Расходы
+  label_summary: Сводка
+  label_description: Описание
+  label_amount: Сумма
+  label_edit_expense: Редактировать расходы
+  label_new_expense: Добавить расходы
+  label_lock: Заблокировать
+  label_unlock: Разблокировать
+  label_show_locked_contracts: Показать заблокированные контракты
+  label_show_only_active_recurring: "Показать \"активные\" повторяющиеся контракты"
+  label_recurring: Повторяемость
+  label_cancel_recurring: Отменить повторяемость
+  label_view_series: Просмотор серий
+  label_tooltips: Справка по контрактам
+  label_contract_types: Типы контрактов
 
+  text_contract_list: Список контрактов
   text_are_you_sure_delete_title: "Вы действительно хотите удалить %{value}?"
+  text_are_you_sure_stop_recurring: "Вы уверены, что хотите остановить этот повторяющийся контракт?"
   text_are_you_sure_delete_time_entry: "Вы действительно хотите удалить эту запись?"
+  text_are_you_sure_delete_expense: "Вы уверены, что хотите удалить эти расходы?"
   text_time_exceeded_time_remaining: "Эта работа превышает оставшееся время по контракту на %{hours_over}.\nДля работы в рамках контракта укажите время не более %{hours_remaining}."
   text_must_come_after_agreement_date: должна быть не ранее даты соглашения
   text_must_come_after_start_date: должна быть позже даты начала
@@ -54,14 +105,52 @@ ru:
   text_contract_updated: Контракт успешно обновлен!
   text_contract_deleted: Контракт успешно удален
   text_hours_over_contract: "Лимит по контракту превышен на %{hours_over}."
+  text_split_time_entry_saved: Ваша временная запись была разделена на две записи, так как она превысила оставшееся время по выбранному контракту. Вторая запись была добавлена к новому контракту, находящемуся на рассмотрении.
+  text_one_time_entry_saved: Был создан новый ожидающий рассмотрения контракт, и ваше время было сохранено там, потому что выбранный вами контракт не имел оставшегося времени.
+  text_hours_too_large: is invalid. Сумма превышает оставшееся время плюс размер нового контракта.
+  text_invalid_rate: "Ставка подрядчика должна быть равна нулю или больше."
+  text_invalid_issue_id: "ошибочный номер (ID) задачи"
+  text_invalid_hours: "недействителен. В контракте %{title} осталось только %{hours}. Попросите вашего администратора включить автоматическое создание контрактов в настройках контрактов."
+  text_second_time_entry_failure: "что-то пошло не так. Вторая часть этой записи с раздельным временем не может быть сохранена. %{error}"
+  text_auto_contract_failure: "что-то пошло не так. Новый контракт для этой записи с раздельным временем не может быть сохранён. %{error}"
+  text_expense_created: 'Расходы были успешно созданы.'
+  text_expense_updated: 'Расходы были успешно обновлены.'
+  text_agreement_pending: 'ожидается принятие решения'
+  text_no_end_date: 'без даты окончания'
+  text_na: 'Не применимо'
+  text_contract_locked: Контракт был успешно заблокирован.
+  text_contract_unlocked: Контракт был успешно разблокирован.
+  text_locked_contract_cache_updated: Эта запись связана с заблокированным контрактом. Кэшированные значения контракта были обновлены, чтобы отразить ваши изменения.
+  text_expenses_uneditable: Расходы по данному договору не подлежат редактированию (договор заблокирован).
+  text_expense_deleted: Расходы удалены.
+  text_apply: Применить
+  text_previous_id: "В последнем контракте, созданном для этого проекта, использовался ID %{previous_id}."
+  text_contract_category_helper: "[Необязательно] Если заголовок не указан, в заголовке по умолчанию будет использоваться эта категория. Они управляются перечислениями."
+  text_contract_title_helper: "[Необязательно] Используется для отмены заголовка по умолчанию."
+  text_hourly_rate_helper: "Помогает определить, сколько платить подрядчику. Не имеет ничего общего с эффективной почасовой ставкой."
+  text_hour: / час
+  text_fixed_contract_help: Фикс конракт иделаьно подходит для ситуации, когда вы должны заплатить фиксированную цену за. Фикс конракты будут одображаться на соответсвующей вкладке в общем списке контрактов. В контрактах с фиксированной ставкой почасовая ставка определяется по времени и не вычитается из Суммы покупки. Поле почасовой ставки просто поможет вам определить, сколько платить потенциальным подрядчикам, работающим по проекту.
+  text_recurring_contract_help: Периодические контракты идеально подходят для подписки. Периодические контракты отображаются на вкладке "Фиксированные контракты" на странице "Список контрактов". Они обозначаются в колонке "Периодические". Периодические контракты с фиксированной ценой подобны контрактам с фиксированной ценой за исключением того, что они автоматически создают новые контракты на основе повторяющегося графика.
+  text_hourly_contract_help: Почасовые контракты идеально подходят, когда вам платят почасовую оплату. Почасовые контракты отображаются на вкладке "Почасовые контракты" на странице "Список контрактов". В почасовых контрактах, записи времени (по почасовой ставке подрядчиков) будут вычитаться из Суммы Покупки. Если выбрано в настройках Плагина контракта, то новые контракты могут создаваться автоматически, когда запись в журнале времени превышает текущую Сумму Покупки.
 
   field_contract: Контракт
-  field_title: Заголовок
+  field_project_contract: ID контракта
   field_description: Описание
   field_agreement_date: Дата соглашения
   field_start_date: Дата начала работ
   field_end_date: Дата завершения работ
   field_purchase_amount: Сумма к оплате
-  field_hourly_rate: Часовой рейт
+  field_hourly_rate: Часовая ставка
   field_contract_url: Ссылка на контракт
   field_invoice_url: Ссылка на счет
+  field_is_fixed_price: Фикс цена
+  field_contract_type: Тип контракта
+  field_recurring_frequency: Периодичность
+
+  field_expense_name: Наименование
+  field_expense_date: Дата платежа
+  field_amount: Сумма
+  field_expense_contract: Контракт
+  field_issue: Задача (ID)
+
+  enumeration_contract_categories: Категории контракта

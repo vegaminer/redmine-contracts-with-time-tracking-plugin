@@ -86,7 +86,7 @@ module Contracts
         end
       end
 
-      Setting.plugin_contracts.update({last_cron_run: Date.today})
+     # Setting.plugin_contracts.update({last_cron_run: Date.today})
     end
 
     def expire_contract(contract)
